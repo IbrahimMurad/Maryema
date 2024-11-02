@@ -1,3 +1,7 @@
+""" the models module for the stock app
+contains Size, ProductColor, Stock models
+"""
+
 import re
 
 from django.db import models
@@ -8,13 +12,15 @@ from discounts.models import Discount
 from products.models import Product
 
 
-def validate_size(value):
+def validate_size(value) -> None:
+    """validates the size of the product to be a number
+    or a string in [XS, S, M, L, XL, XXL]"""
     if not value.isdigit() or value not in ["XS", "S", "M", "L", "XL", "XXL"]:
         raise ValueError("This is not a valid size")
 
 
 class Size(BaseModel):
-    """Size model"""
+    """Size model - specifies the size of the product"""
 
     name = models.CharField(max_length=3, validators=[validate_size])
 
@@ -23,17 +29,22 @@ class Size(BaseModel):
         verbose_name_plural = "Sizes"
         db_table = "sizes"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
-def validate_color(value):
+def validate_color(value) -> None:
+    """validate that the color is an rgb hexadecimal color code"""
     if not re.match(r"^#(?:[0-9a-fA-F]{3}){1,2}$", value):
         raise ValueError("This is not a valid color")
 
 
+def image_path(instance, _) -> str:
+    return f"products/{slugify(instance.product_colored.product.name)}-{str(instance.product_colored)}"
+
+
 class ProductColor(BaseModel):
-    """procut_color model (hexadecimal) - the rgb color code of the product"""
+    """procut_color model (hexadecimal) - the product and its rgb color code"""
 
     product = models.ForeignKey(
         Product,
@@ -50,27 +61,24 @@ class ProductColor(BaseModel):
         blank=True,
         help_text="a second color for dual-color products",
     )
+    image = models.ImageField(upload_to=image_path, null=True, blank=True)
 
     class Meta:
         verbose_name = "Product Color"
         verbose_name_plural = "Product Colors"
         db_table = "product_colors"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{str(self.product)} - {self.color_1[1:]}" + (
             f"-{self.color_2[1:]}" if self.color_2 else ""
         )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         self.full_clean()
         # fill color_2 with color_1 if color_2 is empty
         if not self.color_2:
             self.color_2 = self.color_1
         super().save(*args, **kwargs)
-
-
-def image_path(instance, _):
-    return f"products/{slugify(instance.product_colored.product.name)}-{str(instance.product_colored)}"
 
 
 class Stock(BaseModel):
@@ -82,8 +90,6 @@ class Stock(BaseModel):
         related_name="stocks",
         related_query_name="stock",
     )
-
-    image = models.ImageField(upload_to=image_path, null=True, blank=True)
 
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
 
@@ -106,5 +112,17 @@ class Stock(BaseModel):
         verbose_name_plural = "Stocks"
         db_table = "stocks"
 
-    def __str__(self):
-        return f"{self.product} - {self.size} - {self.color}"
+    def __str__(self) -> str:
+        return f"{self.product_colored} - {self.size}"
+
+    @property
+    def product(self) -> Product:
+        """returns the product of the stock"""
+        return self.product_colored.product
+
+    @property
+    def price_after_discount(self) -> int:
+        """returns the price after applying the discount"""
+        if self.discount:
+            return self.price - (self.discount.factor * self.price)
+        return self.price

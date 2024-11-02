@@ -1,3 +1,7 @@
+""" the models module of the products app
+contains the Division, Category, and Product models of the products app.
+"""
+
 from django.db import models
 from django.utils.text import slugify
 
@@ -8,14 +12,14 @@ from discounts.models import Discount
 class Division(BaseModel):
     """Division model (clothes and accessories)"""
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = "Division"
         verbose_name_plural = "Divisions"
         db_table = "divisions"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return slugify(self.name)
 
 
@@ -28,15 +32,15 @@ class Category(BaseModel):
         related_name="categories",
         related_query_name="category",
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=64)
 
     class Meta:
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         db_table = "categories"
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return slugify(self.name)
 
 
 class Product(BaseModel):
@@ -48,7 +52,7 @@ class Product(BaseModel):
         related_name="products",
         related_query_name="product",
     )
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=64)
     description = models.TextField(null=True, blank=True)
     discount = models.ForeignKey(
         Discount,
@@ -64,5 +68,5 @@ class Product(BaseModel):
         verbose_name_plural = "Products"
         db_table = "products"
 
-    def __str__(self):
-        return self.name
+    def __str__(self) -> str:
+        return slugify(self.name)
