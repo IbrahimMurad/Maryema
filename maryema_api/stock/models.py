@@ -121,8 +121,13 @@ class Stock(BaseModel):
         return self.product_colored.product
 
     @property
+    def selling_price(self) -> int:
+        """returns the price of the stock after adding profit"""
+        return self.price + self.profited_price
+
+    @property
     def price_after_discount(self) -> int:
         """returns the price after applying the discount"""
         if self.discount:
-            return self.price - (self.discount.factor * self.price)
-        return self.price
+            return self.selling_price - (self.discount.factor * self.selling_price)
+        return self.selling_price
