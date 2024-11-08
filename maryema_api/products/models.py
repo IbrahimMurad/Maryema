@@ -69,4 +69,4 @@ class Product(BaseModel):
         db_table = "products"
 
     def __str__(self) -> str:
-        return slugify(self.name)
+        return self.name

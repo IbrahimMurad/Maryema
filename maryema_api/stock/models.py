@@ -15,7 +15,7 @@ from products.models import Product
 def validate_size(value) -> None:
     """validates the size of the product to be a number
     or a string in [XS, S, M, L, XL, XXL]"""
-    if not value.isdigit() or value not in ["XS", "S", "M", "L", "XL", "XXL"]:
+    if not (value.isdigit() or value in ["XS", "S", "M", "L", "XL", "XXL"]):
         raise ValueError("This is not a valid size")
 
 
