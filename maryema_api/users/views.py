@@ -1,58 +1,131 @@
-from django.contrib.auth import authenticate, login, logout
-from rest_framework import status, views, viewsets
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from django.contrib import auth
+from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from users.models import User
-from users.serializers import AdminSerializer, CustomerSerializer
+
+from .serializers import AdminUserSerializer, UserSerializer
 
 
-class AdminUsersView(viewsets.ModelViewSet):
-    """View for admin contol over users
-    admin can list, retrieve, create, update and delete users"""
+class AdminCustomersViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
-    queryset = User.objects.all()
-    serializer_class = AdminSerializer
-    permission_classes = [IsAdminUser]
+    def list(self, request):
+        """
+        Retrieve all users with pagination.
+        """
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        users = User.objects.all()
+        result_page = paginator.paginate_queryset(users, request)
+        serializer = AdminUserSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def customer(self, request, pk=None):
+        """
+        Retrieve, update, or delete a specific user by ID.
+        """
+        try:
+            user = User.objects.get(pk=pk)
+            if request.method == "GET":
+                serializer = AdminUserSerializer(user)
+                return Response(serializer.data)
+            elif request.method == "PUT":
+                serializer = AdminUserSerializer(user, data=request.data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            elif request.method == "DELETE":
+                user.delete()
+                return Response({"details": "User deleted"})
+        except ObjectDoesNotExist:
+            return Response(
+                {"details": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            {"details": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 
-class RegisterUserView(CreateAPIView):
-    """View for registering new users"""
+class ProfileViewSet(viewsets.ViewSet):
+    """
+    ViewSet for retrieving, updating, and deleting the current user's profile.
+    """
 
-    serializer_class = CustomerSerializer
-
-
-class CustomerProfileView(RetrieveUpdateDestroyAPIView):
-    """View for customer to view, update and delete their profile"""
-
-    serializer_class = CustomerSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
-
-
-class LogInView(views.APIView):
-    """View for user login"""
-
-    def post(self, request):
-        user = authenticate(
-            request,
-            username=request.data.get("username"),
-            password=request.data.get("password"),
-        )
-        if user:
-            login(request, user)
-            return Response({"detail": "User logged in"}, status=200)
+    def profile(self, request):
+        user = request.user
+        if request.method == "GET":
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        elif request.method == "PUT":
+            serializer = UserSerializer(user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == "DELETE":
+            password = request.data.get("password")
+            if not password:
+                return Response(
+                    {"details": "Password is required"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not user.check_password(password):
+                return Response(
+                    {"details": "Invalid password"}, status=status.HTTP_400_BAD_REQUEST
+                )
+            user.delete()
+            return Response({"details": "User deleted"})
         return Response(
-            {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            {"details": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED
         )
 
 
-class LogOutView(views.APIView):
-    """View for user logout"""
+class UserAuthViewSet(viewsets.ViewSet):
+    """
+    ViewSet for user authentication actions: register, login, logout.
+    """
 
-    def post(self, request):
-        logout(request)
-        return Response({"detail": "User logged out"}, status=200)
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def register(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
+    def login(self, request):
+        """login view"""
+        email = request.data.get("email")
+        password = request.data.get("password")
+        try:
+            user = auth.authenticate(request, email=email, password=password)
+            print(user)
+            if user:
+                auth.login(request, user)
+                serializer = UserSerializer(user)
+                print(serializer.data)
+                return Response(serializer.data)
+            return Response(
+                {"details": "Invalid email or password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        except ObjectDoesNotExist:
+            return Response(
+                {"details": "Invalid email or password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def logout(self, request):
+        """logout view"""
+        auth.logout(request)
+        return Response({"details": "User logged out"})

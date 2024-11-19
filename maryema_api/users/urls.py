@@ -1,21 +1,25 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from users.views import (
-    AdminUsersView,
-    CustomerProfileView,
-    LogInView,
-    LogOutView,
-    RegisterUserView,
-)
+from .views import AdminCustomersViewSet, ProfileViewSet, UserAuthViewSet
 
 router = DefaultRouter()
-router.register("users", AdminUsersView)
+router.register(r"admin/customers", AdminCustomersViewSet, basename="admin-customers")
+router.register(r"profile", ProfileViewSet, basename="profile")
+router.register(r"auth", UserAuthViewSet, basename="auth")
 
 urlpatterns = [
-    path("admin/", include(router.urls)),
-    path("register/", RegisterUserView.as_view(), name="register"),
-    path("login/", LogInView.as_view(), name="login"),
-    path("logout/", LogOutView.as_view(), name="logout"),
-    path("profile/", CustomerProfileView.as_view(), name="profile"),
+    path("", include(router.urls)),
+    path(
+        "profile/",
+        ProfileViewSet.as_view(
+            {"get": "profile", "put": "profile", "delete": "profile"}
+        ),
+    ),
+    path(
+        "admin/customers/<int:pk>/",
+        AdminCustomersViewSet.as_view(
+            {"get": "customer", "put": "customer", "delete": "customer"}
+        ),
+    ),
 ]
