@@ -15,6 +15,8 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Badge from "@mui/material/Badge";
 import styled from "@mui/system/styled";
 import { Link } from "react-router-dom";
+import { logout } from "../data/auth";
+import { useNavigate } from "react-router-dom";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -38,6 +40,7 @@ function MaryemaHeader() {
 }
 
 function OtherIcons() {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -46,6 +49,20 @@ function OtherIcons() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleLogout = async () => {
+    try {
+      const response = await logout();
+      if (response.status === 200) {
+        navigate("/login");
+      } else {
+        console.error(response.data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className="flex flex-1 items-center justify-between max-w-fit mr-6">
       <Tooltip title="Account settings">
@@ -126,7 +143,7 @@ function OtherIcons() {
             Profile
           </Link>
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>

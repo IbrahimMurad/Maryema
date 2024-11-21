@@ -5,7 +5,6 @@ from .views import AdminCustomersViewSet, ProfileViewSet, UserAuthViewSet
 
 router = DefaultRouter()
 router.register(r"admin/customers", AdminCustomersViewSet, basename="admin-customers")
-router.register(r"profile", ProfileViewSet, basename="profile")
 router.register(r"auth", UserAuthViewSet, basename="auth")
 
 urlpatterns = [

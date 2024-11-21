@@ -1,12 +1,57 @@
 import React, { useState } from "react";
+import { update } from "../data/profile";
+import areEqual from "../utils/areEqual";
 
 export function PersonalInfoForm({ data }) {
+  const initialData = {
+    username: data.username || "",
+    first_name: data.first_name || "",
+    last_name: data.last_name || "",
+    email: data.email || "",
+    phone_number: data.phone_number || "",
+  };
+  const [personalInfo, setPersonalInfo] = useState(initialData);
+  const [errors, setErrors] = useState({});
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    console.log(name, value);
+    setPersonalInfo((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (areEqual(initialData, personalInfo)) {
+      setErrors({ message: "No changes detected." });
+      return;
+    }
+    try {
+      const response = await update(personalInfo);
+      if (response.status === 200) {
+        setPersonalInfo((prev) => ({ ...prev, ...response.data }));
+      } else {
+        setErrors(response.error);
+      }
+    } catch (error) {
+      setErrors({ message: error.message });
+    }
+  }
+
+  function handleCancel() {
+    setPersonalInfo(initialData);
+  }
+
   return (
-    <form className="space-y-12 w-full pt-8">
+    <form onSubmit={handleSubmit} className="space-y-12 w-full pt-8">
       <div className="border-b border-gray-900/10 pb-8 px-4 mx-2">
         <legend className="text-xl font-bold text-gray-900 pt-4">
           Personal Information
         </legend>
+        {errors?.message && (
+          <div className="py-2 text-center rounded-md mt-8 border border-red-400 text-red-500 font-semibold text-sm bg-red-100 opacity-90">
+            {errors.message}
+          </div>
+        )}
         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
           <div className="sm:col-span-3">
             <label
@@ -20,10 +65,18 @@ export function PersonalInfoForm({ data }) {
                 id="username"
                 name="username"
                 type="text"
-                value={data?.username}
+                value={personalInfo.username}
+                onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
             </div>
+            {errors?.username && (
+              <ul className="h-4 text-red-500 text-sm ml-4">
+                {errors.username.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="sm:col-span-3 sm:col-start-1">
             <label
@@ -35,12 +88,20 @@ export function PersonalInfoForm({ data }) {
             <div className="mt-2">
               <input
                 id="first-name"
-                name="first-name"
+                name="first_name"
                 type="text"
-                value={data?.first_name}
+                value={personalInfo.first_name}
+                onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
             </div>
+            {errors?.first_name && (
+              <ul className="h-4 text-red-500 text-sm ml-4">
+                {errors.first_name.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="sm:col-span-3">
@@ -53,12 +114,20 @@ export function PersonalInfoForm({ data }) {
             <div className="mt-2">
               <input
                 id="last-name"
-                name="last-name"
+                name="last_name"
                 type="text"
-                value={data?.last_name}
+                value={personalInfo.last_name}
+                onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
             </div>
+            {errors?.last_name && (
+              <ul className="h-4 text-red-500 text-sm ml-4">
+                {errors.last_name.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="sm:col-span-4">
@@ -73,10 +142,18 @@ export function PersonalInfoForm({ data }) {
                 id="email"
                 name="email"
                 type="email"
-                value={data?.email}
+                value={personalInfo.email}
+                onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
             </div>
+            {errors?.email && (
+              <ul className="h-4 text-red-500 text-sm ml-4">
+                {errors.email.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="sm:col-span-4">
             <label
@@ -88,18 +165,27 @@ export function PersonalInfoForm({ data }) {
             <div className="mt-2">
               <input
                 id="phone-number"
-                name="phone-number"
+                name="phone_number"
                 type="tel"
-                value={data?.phone_number}
+                value={personalInfo.phone_number}
+                onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
             </div>
+            {errors?.phone_number && (
+              <ul className="h-4 text-red-500 text-sm ml-4">
+                {errors.phone_number.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
         <div className="mt-8 flex items-center justify-end gap-x-6">
           <button
             type="button"
             className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-gray-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+            onClick={handleCancel}
           >
             Cancel
           </button>

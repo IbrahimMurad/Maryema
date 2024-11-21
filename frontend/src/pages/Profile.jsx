@@ -33,9 +33,15 @@ export default function Profile() {
       <div className="border-b border-gray-900/10 pb-4">
         <h2 className="text-4xl font-bold text-gray-900">Profile</h2>
       </div>
-      <PersonalInfoForm data={profile} />
-      <ChangePasswordForm />
-      <DeleteAccount />
+      {profile ? (
+        <>
+          <PersonalInfoForm data={profile} />
+          <ChangePasswordForm />
+          <DeleteAccount />
+        </>
+      ) : (
+        <div>Loading...</div>
+      )}
     </div>
   );
 }

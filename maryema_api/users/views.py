@@ -65,6 +65,7 @@ class ProfileViewSet(viewsets.ViewSet):
             serializer = UserSerializer(user)
             return Response(serializer.data)
         elif request.method == "PUT":
+            print(request.data)
             serializer = UserSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -128,4 +129,4 @@ class UserAuthViewSet(viewsets.ViewSet):
     def logout(self, request):
         """logout view"""
         auth.logout(request)
-        return Response({"details": "User logged out"})
+        return Response({"details": "logged out successfully"})
