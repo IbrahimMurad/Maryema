@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { update } from "../data/profile";
+import { update, deleteProfile, changePassword } from "../data/profile";
 import areEqual from "../utils/areEqual";
+import { useNavigate } from "react-router-dom";
 
 export function PersonalInfoForm({ data }) {
   const initialData = {
@@ -205,9 +206,57 @@ export function ChangePasswordForm() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changePassowrdError, setChangePasswordError] = useState(null);
+
+  function handleOldPasswordChange(event) {
+    const { value } = event.target;
+    setOldPassword(value);
+  }
+
+  function handleNewPasswordChange(event) {
+    const { value } = event.target;
+    setNewPassword(value);
+  }
+
+  function handleConfirmPasswordChange(event) {
+    const { value } = event.target;
+    setConfirmPassword(value);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError("Passwords do not match.");
+      return;
+    }
+    try {
+      const response = await changePassword({ oldPassword, newPassword });
+      if (response.status === 200) {
+        alert("Password changed successfully.");
+      } else {
+        setChangePasswordError(response.error.details);
+      }
+    } catch (error) {
+      setChangePasswordError(error.message);
+    }
+  }
+
+  function handleCancel() {
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  }
 
   return (
-    <form className="space-y-12 w-full pt-8">
+    <form onSubmit={handleSubmit} className="space-y-12 w-full pt-8">
+      {changePassowrdError && (
+        <div className="py-2 text-center rounded-md mt-8 border border-red-400 text-red-500 font-semibold text-sm bg-red-100 opacity-90">
+          {changePassowrdError}
+        </div>
+      )}
       <div className="border-b border-gray-900/10 pb-8 px-4 mx-2">
         <legend className="text-xl font-bold text-gray-900">
           Change password
@@ -225,6 +274,8 @@ export function ChangePasswordForm() {
                 id="old-password"
                 name="old-password"
                 type={showOldPassword ? "text" : "password"}
+                value={oldPassword}
+                onChange={handleOldPasswordChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
               <button
@@ -248,6 +299,8 @@ export function ChangePasswordForm() {
                 id="new-password"
                 name="new-password"
                 type={showNewPassword ? "text" : "password"}
+                value={newPassword}
+                onChange={handleNewPasswordChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
               <button
@@ -272,6 +325,8 @@ export function ChangePasswordForm() {
                 id="confirm-password"
                 name="confirm-password"
                 type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
                 className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
               />
               <button
@@ -287,6 +342,7 @@ export function ChangePasswordForm() {
         <div className="mt-8 flex items-center justify-end gap-x-6">
           <button
             type="button"
+            onClick={handleCancel}
             className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-gray-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
           >
             Cancel
@@ -304,8 +360,37 @@ export function ChangePasswordForm() {
 }
 
 export function DeleteAccount() {
+  const [password, setPassword] = useState("");
+  const [deleteError, setDeleteError] = useState(null);
+  const navigate = useNavigate();
+
+  function handleChange(event) {
+    const { value } = event.target;
+    setPassword(value);
+  }
+
+  async function handelSubmit(event) {
+    event.preventDefault();
+    try {
+      const response = await deleteProfile({ password });
+      if (response.status === 200) {
+        alert("Account deleted successfully.");
+        navigate("/login");
+      } else {
+        setDeleteError(response.error.details);
+      }
+    } catch (error) {
+      setDeleteError(error.message);
+    }
+  }
+
   return (
-    <div className="py-8 px-4 mx-2">
+    <form onSubmit={handelSubmit} className="py-8 px-4 mx-2">
+      {deleteError && (
+        <div className="py-2 text-center rounded-md mt-8 border border-red-400 text-red-500 font-semibold text-sm bg-red-100 opacity-90">
+          {deleteError}
+        </div>
+      )}
       <legend className="text-xl font-bold text-gray-900">
         Delete Account
       </legend>
@@ -322,6 +407,8 @@ export function DeleteAccount() {
               id="password"
               name="password"
               type="password"
+              value={password}
+              onChange={handleChange}
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6"
             />
           </div>
@@ -330,6 +417,7 @@ export function DeleteAccount() {
       <div className="mt-8 flex items-center justify-end gap-x-6">
         <button
           type="button"
+          onClick={() => setPassword("")}
           className="rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-black shadow-sm hover:bg-gray-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
         >
           Cancel
@@ -341,6 +429,6 @@ export function DeleteAccount() {
           Delete Account
         </button>
       </div>
-    </div>
+    </form>
   );
 }

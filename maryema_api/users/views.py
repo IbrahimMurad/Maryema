@@ -4,9 +4,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework_simplejwt.exceptions import InvalidToken
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from users.models import User
+from users.servecies import refresh_token, remove_tokens, set_tokens
 
 from .serializers import AdminUserSerializer, UserSerializer
 
@@ -102,31 +106,74 @@ class UserAuthViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=["post"], permission_classes=[AllowAny])
-    def login(self, request):
-        """login view"""
-        email = request.data.get("email")
-        password = request.data.get("password")
-        try:
-            user = auth.authenticate(request, email=email, password=password)
-            print(user)
-            if user:
-                auth.login(request, user)
-                serializer = UserSerializer(user)
-                print(serializer.data)
-                return Response(serializer.data)
-            return Response(
-                {"details": "Invalid email or password"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        except ObjectDoesNotExist:
-            return Response(
-                {"details": "Invalid email or password"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def logout(self, request):
         """logout view"""
         auth.logout(request)
-        return Response({"details": "logged out successfully"})
+        return remove_tokens(request)
+
+
+class CustomOptainToken(TokenObtainPairView):
+    permission_classes = [AllowAny]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        try:
+            response = super().post(request, *args, **kwargs)
+            return set_tokens(response)
+        except Exception:
+            return Response(
+                {"details": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class CustomRefreshToken(TokenRefreshView):
+    permission_classes = [AllowAny]
+
+    def post(self, request: Request, *args, **kwargs) -> Response:
+        refresh = request.COOKIES.get("refresh")
+        if not refresh:
+            return Response(
+                {"details": "Refresh token is not provided."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        request.data["refresh"] = refresh
+        try:
+            response = super().post(request, *args, **kwargs)
+            return refresh_token(response)
+
+        except InvalidToken:
+            return Response(
+                {"details": "Invalid refresh token"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+
+class ChangePassword(viewsets.ViewSet):
+    """
+    ViewSet for changing the password of the user.
+    """
+
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["put"]
+
+    def change_password(self, request):
+        user = request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+        if not old_password or not new_password:
+            return Response(
+                {"details": "Old and new passwords are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not user.check_password(old_password):
+            return Response(
+                {"details": "Invalid old password"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            user.set_password(new_password)
+            user.save()
+            return Response({"details": "Password changed"})
+        except Exception:
+            return Response(
+                {"details": "Password not changed"}, status=status.HTTP_400_BAD_REQUEST
+            )
