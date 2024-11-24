@@ -17,3 +17,12 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+/* 
+  remove the default styling of taiwind
+  to not intercept with the default stying
+  of TextField component
+*/
+input {
+  --tw-ring-shadow: 0 0 #000 !important;
+}

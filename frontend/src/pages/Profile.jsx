@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from "react";
-import {
-  PersonalInfoForm,
-  ChangePasswordForm,
-  DeleteAccount,
-} from "../components/ProfileForms";
+import { ChangePasswordForm, DeleteAccount } from "../components/ProfileForms";
+import PersonalInfoForm from "../components/profile/PersonalInfo";
 import { get } from "../data/profile";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
 
+  // Fetch the profile data when the component mounts
+  // for the first time and store it in profile state
   useEffect(() => {
     async function fetchData() {
       const response = await get();
       if (response.status === 200) {
-        setProfile(response.data);
+        setProfile({
+          first_name: response.data.first_name || "",
+          last_name: response.data.last_name || "",
+          username: response.data.username || "",
+          email: response.data.email || "",
+          phone_number: response.data.phone_number || "",
+        });
       } else {
         setError(response.error);
       }
