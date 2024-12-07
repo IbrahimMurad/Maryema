@@ -5,14 +5,17 @@ URL configuration for core project.
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
-from users.views import CustomOptainToken, CustomRefreshToken
+from users.views import CustomerViewSet, UsersViewSet
+
+router = DefaultRouter()
+router.register("users", UsersViewSet, basename="users")
+router.register("customers", CustomerViewSet, basename="customers")
 
 urlpatterns = [
+    path("api/", include(router.urls)),
     path("admin/", admin.site.urls),
-    path("api/", include("users.urls")),
-    path("api/token/", CustomOptainToken.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", CustomRefreshToken.as_view(), name="token_refresh"),
     path("api-auth/", include("rest_framework.urls")),
 ]
 

@@ -1,66 +1,63 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from users.models import User
+from users.models import Profile
+
+
+class ProfileSerialiser(serializers.ModelSerializer):
+    """
+    Serializer for the User model for customers.
+    """
+
+    class Meta:
+        model = Profile
+        fields = ["avatar", "phone_number"]
 
 
 class UserSerializer(serializers.ModelSerializer):
     """
-    Serializer for the User model.
+    Serializer for the User model for customers.
     """
+
+    profile = ProfileSerialiser()
 
     class Meta:
         model = User
         fields = [
             "id",
-            "email",
             "username",
+            "email",
             "first_name",
             "last_name",
-            "phone_number",
             "password",
+            "profile",
         ]
         read_only_fields = ["id"]
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        """
-        Create a new user.
-        """
-        print(validated_data)
+        profile_data = validated_data.pop("profile")
         user = User.objects.create_user(**validated_data)
+        Profile.objects.create(user=user, **profile_data)
         return user
 
     def update(self, instance, validated_data):
-        """
-        Update a user.
-        """
-        password = validated_data.pop("password", None)
-        user = super().update(instance, validated_data)
-        if password:
-            user.set_password(password)
-            user.save()
-        return user
+        profile_data = validated_data.pop("profile", {})
+        profile = instance.profile
 
+        # Update profile fields
+        for attr, value in profile_data.items():
+            current_value = getattr(profile, attr)
+            if current_value != value:
+                setattr(profile, attr, value)
+        profile.save()
 
-class AdminUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the User model for admin control over customers.
-    """
+        # Update User fields
+        for attr, value in validated_data.items():
+            if attr == "password":
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
 
-    class Meta:
-        model = User
-        exclude = ["password"]
-        read_only_fields = [
-            "id",
-            "is_staff",
-            "is_superuser",
-            "date_joined",
-            "last_login",
-        ]
-
-    def update(self, instance, validated_data):
-        """
-        Update a user.
-        """
-        user = super().update(instance, validated_data)
-        return user
+        return instance

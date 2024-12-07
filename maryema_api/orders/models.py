@@ -6,7 +6,14 @@ from django.db import models
 from core.models import BaseModel
 from discounts.models import Discount
 from stock.models import Stock
-from users.models import User
+from users.models import Profile as User
+
+
+def is_customer(value):
+    """Custom validator to check if the user is a customer"""
+    if not value.is_customer:
+        raise models.ValidationError("The user is not a customer.")
+    return value
 
 
 class Order(BaseModel):
@@ -18,7 +25,7 @@ class Order(BaseModel):
         PENDING = "PENDING", "Pending"
         PROSSISSING = "PROSSISSING", "Prossissing"
         REJECTED = "REJECTED", "Rejected"
-        COMPLETED = ("COMPLETED", "Completed")
+        COMPLETED = "COMPLETED", "Completed"
         CANCELED = "CANCELED", "Canceled"
 
     user = models.ForeignKey(
@@ -26,6 +33,7 @@ class Order(BaseModel):
         on_delete=models.CASCADE,
         related_name="orders",
         related_query_name="order",
+        validators=[is_customer],
     )
     total = models.DecimalField(decimal_places=2, max_digits=8, default=0.0)
     status = models.CharField(

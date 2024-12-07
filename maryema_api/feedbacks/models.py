@@ -7,17 +7,25 @@ from django.db import models
 
 from core.models import BaseModel
 from products.models import Product
-from users.models import User
+from users.models import Profile as User
+
+
+def is_customer(value):
+    """Custom validator to check if the user is a customer"""
+    if not value.is_customer:
+        raise models.ValidationError("The user is not a customer.")
+    return value
 
 
 class Feedback(BaseModel):
     """Feedback model for user's feedback"""
 
-    user = models.ForeignKey(
+    customer = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name="feedbacks",
         related_query_name="feedback",
+        validators=[is_customer],
     )
     product = models.ForeignKey(
         Product,

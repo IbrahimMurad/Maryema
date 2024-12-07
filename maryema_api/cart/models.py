@@ -2,7 +2,7 @@ from django.db import models
 
 from core.models import BaseModel
 from stock.models import Stock
-from users.models import User
+from users.models import Profile as User
 
 
 class Cart(BaseModel):
