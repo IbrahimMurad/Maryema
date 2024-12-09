@@ -7,21 +7,21 @@ from django.db import models
 
 from core.models import BaseModel
 from products.models import Product
-from users.models import Profile as User
+from users.models import Profile
 
 
-def is_customer(value):
-    """Custom validator to check if the user is a customer"""
-    if not value.is_customer:
-        raise models.ValidationError("The user is not a customer.")
-    return value
+def is_customer(value: Profile) -> None:
+    """A validator to check if the user is a customer"""
+    user = Profile.objects.get(pk=value)
+    if not user.is_customer:
+        raise ValueError("Only customers can give feedbacks.")
 
 
 class Feedback(BaseModel):
     """Feedback model for user's feedback"""
 
     customer = models.ForeignKey(
-        User,
+        Profile,
         on_delete=models.CASCADE,
         related_name="feedbacks",
         related_query_name="feedback",
@@ -44,11 +44,16 @@ class Feedback(BaseModel):
         null=True, blank=True, help_text="The comment of the user."
     )
 
-    def __str__(self):
-        return str(self.product) + " - " + str(self.user)
+    def __str__(self) -> str:
+        return str(self.product) + " - " + str(self.customer)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-rate"]
         verbose_name = "Feedback"
         verbose_name_plural = "Feedbacks"
         db_table = "feedback"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["customer", "product"], name="unique_feedback"
+            )
+        ]

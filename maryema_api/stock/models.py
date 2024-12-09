@@ -39,8 +39,10 @@ def validate_color(value) -> None:
         raise ValueError("This is not a valid color")
 
 
-def image_path(instance, _) -> str:
-    return f"products/{slugify(instance.product_colored.product.name)}-{str(instance.product_colored)}"
+def image_path(instance, file_name) -> str:
+    return (
+        f"products/{slugify(instance.product.name)}/{instance.color1_name}/{file_name}"
+    )
 
 
 class ProductColor(BaseModel):
@@ -49,12 +51,14 @@ class ProductColor(BaseModel):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name="product_colored",
-        related_query_name="product_colored",
+        related_name="colors",
+        related_query_name="color",
     )
 
-    color_1 = models.CharField(max_length=7, validators=[validate_color])
-    color_2 = models.CharField(
+    color1_name = models.CharField(max_length=20)
+    color1_value = models.CharField(max_length=7, validators=[validate_color])
+    color2_name = models.CharField(max_length=20, null=True, blank=True)
+    color2_value = models.CharField(
         max_length=7,
         validators=[validate_color],
         null=True,
@@ -64,21 +68,14 @@ class ProductColor(BaseModel):
     image = models.ImageField(upload_to=image_path, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Product Color"
-        verbose_name_plural = "Product Colors"
+        verbose_name = "Color"
+        verbose_name_plural = "Colors"
         db_table = "product_colors"
 
     def __str__(self) -> str:
-        return f"{str(self.product)} - {self.color_1[1:]}" + (
-            f"-{self.color_2[1:]}" if self.color_2 else ""
+        return f"{str(self.product)} - {self.color1_name}" + (
+            f"-{self.color2_name}" if self.color2_name else ""
         )
-
-    def save(self, *args, **kwargs) -> None:
-        self.full_clean()
-        # fill color_2 with color_1 if color_2 is empty
-        if not self.color_2:
-            self.color_2 = self.color_1
-        super().save(*args, **kwargs)
 
 
 class Stock(BaseModel):
@@ -111,6 +108,7 @@ class Stock(BaseModel):
         verbose_name = "Stock"
         verbose_name_plural = "Stocks"
         db_table = "stocks"
+        ordering = ["price"]
 
     def __str__(self) -> str:
         return f"{self.product_colored} - {self.size}"
@@ -129,5 +127,5 @@ class Stock(BaseModel):
     def price_after_discount(self) -> int:
         """returns the price after applying the discount"""
         if self.discount:
-            return self.selling_price - (self.discount.factor * self.selling_price)
+            return self.selling_price - self.discount.amount
         return self.selling_price

@@ -5,7 +5,7 @@ product discount: all customers benifit from it and order discount is for a spec
 
 from datetime import datetime, timedelta
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models import BaseModel
@@ -27,9 +27,14 @@ class Discount(BaseModel):
             "e.g. eid discount, black friday, special offer for Eisha ,etc."
         ),
     )
-    percentage = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
-        help_text="discount percentage as a float number between 0 and 100",
+    code = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text="a unique code for the discount",
+    )
+    amount = models.PositiveIntegerField(
+        validators=[MinValueValidator(10)],
+        help_text="discount amount as a fixed number",
     )
     start = models.DateTimeField(default=datetime.now)
     end = models.DateTimeField(default=end_date)
@@ -40,9 +45,4 @@ class Discount(BaseModel):
         db_table = "discounts"
 
     def __str__(self) -> str:
-        return self.discount_type + " - " + str(self.discount) + "%"
-
-    @property
-    def factor(self) -> float:
-        """returns the discount factor as a float number between 0 and 1"""
-        return self.percentage / 100
+        return self.discount_type + " - " + str(self.amount)

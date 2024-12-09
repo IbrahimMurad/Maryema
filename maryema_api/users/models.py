@@ -55,7 +55,7 @@ class Profile(models.Model):
     providers = ProviderManager()
 
     class Meta:
-        db_table = "users"
+        db_table = "profiles"
         ordering = ["user__date_joined"]
 
     def __str__(self) -> str:

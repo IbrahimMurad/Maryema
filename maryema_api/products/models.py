@@ -3,7 +3,6 @@ contains the Division, Category, and Product models of the products app.
 """
 
 from django.db import models
-from django.utils.text import slugify
 
 from core.models import BaseModel
 from discounts.models import Discount
@@ -20,7 +19,7 @@ class Division(BaseModel):
         db_table = "divisions"
 
     def __str__(self) -> str:
-        return slugify(self.name)
+        return self.name
 
 
 class Category(BaseModel):
@@ -40,7 +39,7 @@ class Category(BaseModel):
         db_table = "categories"
 
     def __str__(self) -> str:
-        return slugify(self.name)
+        return self.name
 
 
 class Product(BaseModel):
@@ -70,3 +69,16 @@ class Product(BaseModel):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def price(self):
+        return self.colors.aggregate(models.Min("stock__price")).get(
+            "stock__price__min"
+        )
+
+    @property
+    def image(self):
+        if self.colors.first():
+            if self.colors.first().image:
+                return self.colors.first().image.url
+        return None
