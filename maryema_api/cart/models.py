@@ -10,9 +10,23 @@ class Cart(BaseModel):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.BooleanField(
+        default=True, help_text="True if cart is active, False if cart is inactive"
+    )
 
     def __str__(self) -> str:
         return f"{self.user}'s cart"
+
+    class Meta:
+        verbose_name_plural = "Carts"
+        db_table = "cart"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=models.Q(status=True),
+                name="unique_active_cart",
+            )
+        ]
 
 
 class CartItem(BaseModel):
@@ -23,7 +37,7 @@ class CartItem(BaseModel):
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self) -> str:
-        return f"{self.stock} x {self.quantity} in {self.cart}"
+        return f"{self.product} x {self.quantity} in {self.cart}"
 
     @property
     def subtotal(self) -> float:

@@ -30,12 +30,12 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    price = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField(read_only=True)
+    image = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Product
-        fields = "__all__"
+        exclude = ["updated_at"]
         read_only_fields = ["id"]
 
     def get_price(self, obj):
@@ -46,9 +46,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
-    category = CategoryDetailSerializer()
+    category = CategoryDetailSerializer(read_only=True)
     colors = ProductColorSerializer(many=True)
-    feedbacks = FeedbackSerializer(many=True)
+    feedbacks = FeedbackSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product

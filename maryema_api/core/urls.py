@@ -14,8 +14,8 @@ from users.views import CustomerViewSet, UsersViewSet
 router = DefaultRouter()
 router.register("users", UsersViewSet, basename="users")
 router.register("customers", CustomerViewSet, basename="customers")
-router.register("products", ProductViewSet, basename="products")
-router.register("product-details", ProductDetailsViewSet, basename="product-details")
+router.register("products-list", ProductViewSet, basename="products-list")
+router.register("products", ProductDetailsViewSet, basename="products")
 router.register("feedbacks", FeedbackViewSet, basename="feedbacks")
 
 urlpatterns = [
