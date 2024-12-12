@@ -6,20 +6,24 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+from rest_framework_nested import routers
 
 from feedbacks.views import FeedbackViewSet
-from products.views import FilterDataView, ProductDetailsViewSet, ProductViewSet
+from products.views import FilterDataView, ProductViewSet
 from users.views import CustomerViewSet, UsersViewSet
 
 router = DefaultRouter()
 router.register("users", UsersViewSet, basename="users")
 router.register("customers", CustomerViewSet, basename="customers")
-router.register("products-list", ProductViewSet, basename="products-list")
-router.register("products", ProductDetailsViewSet, basename="products")
-router.register("feedbacks", FeedbackViewSet, basename="feedbacks")
+router.register("products", ProductViewSet, basename="products")
+
+# Create a nested router for feedbacks
+products_router = routers.NestedDefaultRouter(router, "products", lookup="product")
+products_router.register("feedbacks", FeedbackViewSet, basename="product-feedbacks")
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path("api/", include(products_router.urls)),  # Include the nested router URLs
     path("api/filter/", FilterDataView.as_view(), name="filter"),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),

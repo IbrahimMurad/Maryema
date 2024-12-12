@@ -10,8 +10,8 @@ class CartItemInline(admin.TabularInline):
 
 class CartAdmin(admin.ModelAdmin):
     inlines = [CartItemInline]
-    list_display = ["user", "total"]
-    search_fields = ["user__email"]
+    list_display = ["profile", "total"]
+    search_fields = ["profile__user__email"]
     readonly_fields = ["total"]
 
     class Meta:

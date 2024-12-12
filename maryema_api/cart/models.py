@@ -2,27 +2,27 @@ from django.db import models
 
 from core.models import BaseModel
 from stock.models import Stock
-from users.models import Profile as User
+from users.models import Profile
 
 
 class Cart(BaseModel):
     """Cart model"""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.BooleanField(
         default=True, help_text="True if cart is active, False if cart is inactive"
     )
 
     def __str__(self) -> str:
-        return f"{self.user}'s cart"
+        return f"{self.profile}'s cart"
 
     class Meta:
         verbose_name_plural = "Carts"
         db_table = "cart"
         constraints = [
             models.UniqueConstraint(
-                fields=["user"],
+                fields=["profile"],
                 condition=models.Q(status=True),
                 name="unique_active_cart",
             )
@@ -41,4 +41,4 @@ class CartItem(BaseModel):
 
     @property
     def subtotal(self) -> float:
-        return self.product.price_after_discount * self.quantity
+        return self.quantity - self.product.discount.amount

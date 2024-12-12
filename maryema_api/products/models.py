@@ -71,14 +71,18 @@ class Product(BaseModel):
         return self.name
 
     @property
-    def price(self):
+    def display_price(self):
         return self.colors.aggregate(models.Min("stock__price")).get(
             "stock__price__min"
         )
 
     @property
-    def image(self):
+    def display_image(self):
         if self.colors.first():
             if self.colors.first().image:
                 return self.colors.first().image.url
         return None
+
+    @property
+    def average_rate(self) -> float:
+        return self.feedbacks.aggregate(models.Avg("rate")).get("rate__avg")

@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from feedbacks.serializers import FeedbackSerializer
 from products.models import Category, Division, Product
 from products.serializers import (
     CategorySerializer,
@@ -18,7 +19,6 @@ from stock.serializers import FilterColorSerializer
 
 class ProductViewSet(viewsets.GenericViewSet):
     queryset = Product.objects.all().order_by("-created_at")
-    serializer_class = ProductSerializer
 
     def list(self, request, *args, **kwargs):
         filter_params = {}
@@ -70,10 +70,50 @@ class ProductViewSet(viewsets.GenericViewSet):
         page = self.paginate_queryset(queryset)
 
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = ProductSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = ProductSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        feedbacks = instance.feedbacks.all().order_by("-rate")[:5]
+        serialized_feedbacks = FeedbackSerializer(feedbacks, many=True)
+        serializer = ProductDetailSerializer(instance)
+        data = serializer.data
+        data["feedbacks"] = serialized_feedbacks.data
+        return Response(data)
+
+
+class FeedbackViewSet(viewsets.GenericViewSet):
+    """ViewSet for the Feedback model of a product"""
+
+    def list(self, request, *args, **kwargs):
+        product_id = request.params.get("product_id")
+
+        product = Product.objects.get(id=product_id)
+        feedbacks = product.feedbacks.all().order_by("-rate")
+
+        page = self.paginate_queryset(feedbacks)
+
+        if page is not None:
+            serializer = FeedbackSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        product_id = request.params.get("product")
+        product = Product.objects.get(id=product_id)
+        data = request.data
+        data["product"] = product.id
+
+        serializer = FeedbackSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
         return Response(serializer.data)
 
 
@@ -122,8 +162,3 @@ class FilterDataView(APIView):
     @classmethod
     def get_extra_actions(cls):
         return []
-
-
-class ProductDetailsViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductDetailSerializer
