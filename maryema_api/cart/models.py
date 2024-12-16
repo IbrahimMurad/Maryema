@@ -32,7 +32,9 @@ class Cart(BaseModel):
 class CartItem(BaseModel):
     """CartItem model"""
 
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(
+        Cart, on_delete=models.CASCADE, related_name="items", related_query_name="item"
+    )
     product = models.ForeignKey(Stock, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
@@ -41,4 +43,4 @@ class CartItem(BaseModel):
 
     @property
     def subtotal(self) -> float:
-        return self.quantity - self.product.discount.amount
+        return self.quantity * self.product.price

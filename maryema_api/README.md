@@ -30,10 +30,10 @@
 
 - **Cart endpoints**
 
-  - [ ] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/cart`
-  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart`
-  - [ ] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/cart`
-  - [ ] <span style="border-radius: 2px; background-color: red; color: white;">DELETE</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: red; color: white;">DELETE</span> `/api/v1/cart`
   - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart/checkout`
 
 - **Orders endpoints**
