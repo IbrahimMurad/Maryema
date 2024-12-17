@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from cart.models import Cart, CartItem
 from cart.serializers import CartItemSerializer, CartSerializer
+from orders.models import Order, OrderItem
 
 
 class CartViewSet(viewsets.GenericViewSet):
@@ -60,3 +61,33 @@ class CartViewSet(viewsets.GenericViewSet):
         cart_item = CartItem.objects.get(id=kwargs["pk"])
         cart_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CheckoutView(viewsets.GenericViewSet):
+    """Checkout view set"""
+
+    serializer_class = CartSerializer
+
+    def create(self, request, *args, **kwargs):
+        """Checkout the active cart"""
+        active_cart = Cart.objects.get(profile=request.user.profile, status=True)
+        new_order = Order.objects.create(
+            profile=request.user.profile,
+            total=active_cart.total,
+            status=Order.StatusChoice.PENDING,
+        )
+        items = active_cart.items.all()
+        new_order_items = [
+            OrderItem(
+                order=new_order,
+                product=item.product,
+                quantity=item.quantity,
+            )
+            for item in items
+        ]
+        OrderItem.objects.bulk_create(new_order_items)
+        active_cart.status = False
+        active_cart.save()
+        new_order.save()
+        Cart.objects.create(profile=request.user.profile, status=True)
+        return Response(status=status.HTTP_201_CREATED)

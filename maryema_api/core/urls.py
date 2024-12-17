@@ -8,7 +8,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested import routers
 
-from cart.views import CartViewSet
+from cart.views import CartViewSet, CheckoutView
 from feedbacks.views import FeedbackViewSet
 from products.views import FilterDataView, ProductViewSet
 from users.views import CustomerViewSet, UsersViewSet
@@ -18,10 +18,12 @@ router.register("users", UsersViewSet, basename="users")
 router.register("customers", CustomerViewSet, basename="customers")
 router.register("products", ProductViewSet, basename="products")
 router.register("carts", CartViewSet, basename="carts")
+router.register("checkout", CheckoutView, basename="checkout")
 
 # Create a nested router for feedbacks
 products_router = routers.NestedDefaultRouter(router, "products", lookup="product")
 products_router.register("feedbacks", FeedbackViewSet, basename="product-feedbacks")
+
 
 urlpatterns = [
     path("api/", include(router.urls)),

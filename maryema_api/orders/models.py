@@ -6,7 +6,7 @@ from django.db import models
 from core.models import BaseModel
 from discounts.models import Discount
 from stock.models import Stock
-from users.models import Profile as User
+from users.models import Profile
 
 
 def is_customer(value):
@@ -28,8 +28,8 @@ class Order(BaseModel):
         COMPLETED = "COMPLETED", "Completed"
         CANCELED = "CANCELED", "Canceled"
 
-    user = models.ForeignKey(
-        User,
+    profile = models.ForeignKey(
+        Profile,
         on_delete=models.CASCADE,
         related_name="orders",
         related_query_name="order",
@@ -49,7 +49,7 @@ class Order(BaseModel):
     )
 
     def __str__(self) -> str:
-        return f"Order {self.id} - {self.user.email}"
+        return f"Order {self.id} - {self.profile.user.email}"
 
     class Meta:
         ordering = ["-created_at"]

@@ -10,12 +10,10 @@ class OrderItemInline(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     inlines = [OrderItemInline]
-    list_display = ["user", "total", "status"]
-    search_fields = ["user__email"]
-    readonly_fields = ["total", "total_after_discount"]
-
-    class Meta:
-        model = Order
+    list_display = ["id", "profile", "total", "status", "discount", "created_at"]
+    list_filter = ["status", "created_at"]
+    search_fields = ["profile__user__email"]
+    date_hierarchy = "created_at"
 
 
 admin.site.register(Order, OrderAdmin)
