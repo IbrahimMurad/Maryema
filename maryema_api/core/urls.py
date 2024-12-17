@@ -10,6 +10,7 @@ from rest_framework_nested import routers
 
 from cart.views import CartViewSet, CheckoutView
 from feedbacks.views import FeedbackViewSet
+from orders.views import OrderViewSet
 from products.views import FilterDataView, ProductViewSet
 from users.views import CustomerViewSet, UsersViewSet
 
@@ -19,6 +20,7 @@ router.register("customers", CustomerViewSet, basename="customers")
 router.register("products", ProductViewSet, basename="products")
 router.register("carts", CartViewSet, basename="carts")
 router.register("checkout", CheckoutView, basename="checkout")
+router.register("orders", OrderViewSet, basename="orders")
 
 # Create a nested router for feedbacks
 products_router = routers.NestedDefaultRouter(router, "products", lookup="product")

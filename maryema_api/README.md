@@ -1,29 +1,5 @@
 # Maryema API Documentation (The backend)
 
-## Project Description
-Maryema is a clothes store web application. This API serves as the backend for the application, providing various endpoints for managing products, feedback, authentication, cart, and orders.
-
-## Installation
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/IbrahimMurad/Maryema.git
-   ```
-2. Navigate to the project directory:
-   ```sh
-   cd Maryema
-   ```
-3. Install the dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
-
-## Usage
-1. Run the development server:
-   ```sh
-   python3 manage.py runserver
-   ```
-2. Access the API at `http://127.0.0.1:8000`.
-
 ## API Endpoints
 
 ### User Endpoints
@@ -31,54 +7,42 @@ Maryema is a clothes store web application. This API serves as the backend for t
 #### Roadmap
 
 - **Product endpoints**
-  - [x] GET `/api/products`
-  - [x] GET `/api/products/<uuid>`
+
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>`
 
 - **Feedback endpoints**
-  - [x] POST `/api/products/<uuid>/feedbacks`
-  - [x] GET `/api/products/<uuid>/feedbacks`
-  - [x] GET `/api/products/<uuid>/feedbacks/<uuid>`
-  - [x] PUT `/api/products/<uuid>/feedbacks/<uuid>`
+
+  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/products/<uuid>/feedbacks`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>/feedbacks`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>/feedbacks/<uuid>`
+  - [x] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/products/<uuid>/feedbacks/<uuid>`
 
 - **Authentication endpoints**
-  - [ ] POST `/api/auth/register`
-  - [ ] POST `/api/auth/login`
-  - [ ] POST `/api/auth/logout`
-  - [ ] POST `/api/auth/refresh`
-  - [ ] GET `/api/auth/me`
-  - [ ] PUT `/api/auth/me`
-  - [ ] PUT `/api/auth/me/password`
+
+  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/register`
+  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/login`
+  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/logout`
+  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/refresh`
+  - [ ] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/auth/me`
+  - [ ] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/auth/me`
+  - [ ] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/auth/me/password`
 
 - **Cart endpoints**
-  - [x] GET `/api/cart`
-  - [x] POST `/api/cart`
-  - [x] PUT `/api/cart`
-  - [x] DELETE `/api/cart`
-  - [x] POST `/api/checkout`
+
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: red; color: white;">DELETE</span> `/api/v1/cart`
+  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart/checkout`
 
 - **Orders endpoints**
-  - [x] GET `/api/orders`
-  - [x] GET `/api/orders/<uuid>`
-  - [x] GET `/api/orders/<uuid>/cancel`
-  - [x] GET `/api/orders/<uuid>/return`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/\<uuid>`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/<uuid>/cancel`
+  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/<uuid>/return`
 
-### Admin Endpoints
-
-- **Product Management**
-  - GET `/api/admin/products`
-  - POST `/api/admin/products`
-  - GET `/api/admin/products/<uuid>`
-  - PATCH `/api/admin/products/<uuid>`
-  - DELETE `/api/admin/products/<uuid>`
-
-- **Order Management**
-  - GET `/api/admin/orders`
-  - GET `/api/admin/orders/<uuid>`
-  - GET `/api/admin/orders/<uuid>/cancel`
-
-## Example Requests and Responses
-
-### GET /api/products
+#### GET /api/v1/products
 
 - Description: List all products for the user
 - Request: `GET /api/products`
