@@ -7,20 +7,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class AdminManager(models.Manager):
-    """a mnager for admins only"""
-
-    def get_queryset(self) -> models.QuerySet:
-        return super().get_queryset(role=Profile.RoleChoices.ADMIN)
-
-
-class CustomerManager(models.Manager):
-    """a mnager for customers only"""
-
-    def get_queryset(self) -> models.QuerySet:
-        return super().get_queryset(role=Profile.RoleChoices.CUSTOMER)
-
-
 class ProviderManager(models.Manager):
     """a mnager for providers only"""
 
@@ -48,11 +34,6 @@ class Profile(models.Model):
     role = models.TextField(
         max_length=16, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER
     )
-
-    objects = models.Manager()
-    admins = AdminManager()
-    customers = CustomerManager()
-    providers = ProviderManager()
 
     class Meta:
         db_table = "profiles"

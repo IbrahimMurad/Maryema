@@ -12,11 +12,10 @@ from cart.views import CartViewSet, CheckoutView
 from feedbacks.views import FeedbackViewSet
 from orders.views import OrderViewSet
 from products.views import FilterDataView, ProductViewSet
-from users.views import CustomerViewSet, UsersViewSet
+from users.views import AdminUsersViewSet, UsersViewSet
 
 router = DefaultRouter()
 router.register("users", UsersViewSet, basename="users")
-router.register("customers", CustomerViewSet, basename="customers")
 router.register("products", ProductViewSet, basename="products")
 router.register("carts", CartViewSet, basename="carts")
 router.register("checkout", CheckoutView, basename="checkout")
@@ -26,10 +25,14 @@ router.register("orders", OrderViewSet, basename="orders")
 products_router = routers.NestedDefaultRouter(router, "products", lookup="product")
 products_router.register("feedbacks", FeedbackViewSet, basename="product-feedbacks")
 
+admin_router = DefaultRouter()
+admin_router.register("users", AdminUsersViewSet, basename="admin-users")
+
 
 urlpatterns = [
     path("api/", include(router.urls)),
     path("api/", include(products_router.urls)),  # Include the nested router URLs
+    path("api/admin/", include(admin_router.urls)),
     path("api/filter/", FilterDataView.as_view(), name="filter"),
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
