@@ -1,14 +1,14 @@
 from rest_framework import serializers
 
 from discounts.serializers import DiscountSerializer
-from stock.models import ProductColor, Size, Stock
+from stock.models import Color, Size, Stock
 
 
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ["id", "name"]
-        read_only_fields = ["id"]
+        fields = "__all__"
+        read_only_fields = ["id, created_at", "updated_at"]
 
 
 class StockSerializer(serializers.ModelSerializer):
@@ -21,11 +21,11 @@ class StockSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class ProductColorSerializer(serializers.ModelSerializer):
+class ColorSerializer(serializers.ModelSerializer):
     stocks = StockSerializer(many=True)
 
     class Meta:
-        model = ProductColor
+        model = Color
         fields = [
             "id",
             "color1_name",
@@ -38,8 +38,24 @@ class ProductColorSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
-class FilterColorSerializer(ProductColorSerializer):
-    class Meta(ProductColorSerializer.Meta):
-        model = ProductColor
+class FilterColorSerializer(ColorSerializer):
+    class Meta(ColorSerializer.Meta):
+        model = Color
         fields = ["id", "color1_name", "color1_value", "color2_name", "color2_value"]
         read_only_fields = ["id"]
+
+
+class AdminColorsSerializer(serializers.ModelSerializer):
+    """serializer for ProductColor model for admin control panel"""
+
+    class Meta:
+        model = Color
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class AdminStockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stock
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "updated_at"]

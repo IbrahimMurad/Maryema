@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from products.models import Category, Division, Product
-from stock.serializers import ProductColorSerializer
+from stock.serializers import ColorSerializer
 
 
 class DivisionSerializer(serializers.ModelSerializer):
@@ -18,6 +18,14 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "name"]
+
+
+class CategoryListSerializer(serializers.ModelSerializer):
+    """Serializer for Category model for admin control panel"""
+
+    class Meta:
+        model = Category
+        fields = ["id", "name", "division"]
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -42,7 +50,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
-    colors = ProductColorSerializer(many=True)
+    colors = ColorSerializer(many=True)
 
     class Meta:
         model = Product
@@ -54,3 +62,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "colors",
         ]
         read_only_fields = ["id"]
+
+
+class AdminProductSerlaizer(serializers.ModelSerializer):
+    """serializer for product model for admin control panel"""
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+        read_only_fields = ["id", "created_at", "updated_at"]

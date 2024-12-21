@@ -45,7 +45,7 @@ def image_path(instance, file_name) -> str:
     )
 
 
-class ProductColor(BaseModel):
+class Color(BaseModel):
     """procut_color model (hexadecimal) - the product and its rgb color code"""
 
     product = models.ForeignKey(
@@ -70,7 +70,7 @@ class ProductColor(BaseModel):
     class Meta:
         verbose_name = "Color"
         verbose_name_plural = "Colors"
-        db_table = "product_colors"
+        db_table = "colors"
 
     def __str__(self) -> str:
         return f"{str(self.product)} - {self.color1_name}" + (
@@ -81,8 +81,8 @@ class ProductColor(BaseModel):
 class Stock(BaseModel):
     """Stock model"""
 
-    product_colored = models.ForeignKey(
-        ProductColor,
+    color = models.ForeignKey(
+        Color,
         on_delete=models.CASCADE,
         related_name="stocks",
         related_query_name="stock",
@@ -111,12 +111,12 @@ class Stock(BaseModel):
         ordering = ["price"]
 
     def __str__(self) -> str:
-        return f"{self.product_colored} - {self.size}"
+        return f"{self.color} - {self.size}"
 
     @property
     def product(self) -> Product:
         """returns the product of the stock"""
-        return self.product_colored.product
+        return self.color.product
 
     @property
     def selling_price(self) -> int:

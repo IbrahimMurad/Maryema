@@ -8,12 +8,14 @@ from rest_framework.views import APIView
 from feedbacks.serializers import FeedbackSerializer
 from products.models import Category, Division, Product
 from products.serializers import (
+    AdminProductSerlaizer,
+    CategoryListSerializer,
     CategorySerializer,
     DivisionSerializer,
     ProductDetailSerializer,
     ProductSerializer,
 )
-from stock.models import ProductColor
+from stock.models import Color
 from stock.serializers import FilterColorSerializer
 
 
@@ -139,7 +141,7 @@ class FilterDataView(APIView):
             categories = categories.filter(id=category_id)
 
         # only return colors that belong to the selected categories
-        colors = ProductColor.objects.filter(product__category__in=categories)
+        colors = Color.objects.filter(product__category__in=categories)
 
         # filter the rest of the colors based on the provided color_id or retrieve all
         if color_id:
@@ -162,3 +164,18 @@ class FilterDataView(APIView):
     @classmethod
     def get_extra_actions(cls):
         return []
+
+
+class DivisionViewSet(viewsets.ModelViewSet):
+    queryset = Division.objects.all()
+    serializer_class = DivisionSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategoryListSerializer
+
+
+class AdminProducViewset(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = AdminProductSerlaizer

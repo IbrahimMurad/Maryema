@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from stock.models import ProductColor, Size, Stock
+from stock.models import Color, Size, Stock
 
 
 class StockInline(admin.TabularInline):
@@ -12,6 +12,6 @@ class ProductColorAdmin(admin.ModelAdmin):
     inlines = [StockInline]
 
 
-admin.site.register(ProductColor, ProductColorAdmin)
+admin.site.register(Color, ProductColorAdmin)
 admin.site.register(Size)
 admin.site.register(Stock)
