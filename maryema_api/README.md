@@ -1,475 +1,725 @@
-# Maryema API Documentation (The backend)
+# **Maryema**
 
-## API Endpoints
+## **Models**
 
-### User Endpoints
+- [x] [User](#user)
+- [x] [Profile](#profile)
+- [x] [Division](#division)
+- [x] [Category](#category)
+- [x] [Product](#product)
+- [x] [Collection](#collection)
+- [x] [Size](#size)
+- [x] [Color](#color)
+- [x] [Img](#image)
+- [x] [ProductVariant](#productvariant)
+- [x] [Feedback](#feedback)
+- [ ] [Cart](#cart)
+- [ ] [CartItem](#cartitem)
+- [ ] [Order](#order)
+- [ ] [OrderItem](#orderitem)
+- [ ] [DiscountRole](#discountrole)
+- [ ] [DiscountCode](#discountcode)
 
-#### Roadmap
+### **[User](#models)**
 
-- **Product endpoints**
+The `User` model is the default user model provided by Django. It is used to store information about the users of the application.
 
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>`
+| Field        | Type     | Description                  |
+| ------------ | -------- | ---------------------------- |
+| id           | int      | The user's ID                |
+| created_at   | datetime | when the user was created    |
+| last_login   | datetime | when the user last logged in |
+| username     | string   | unique username              |
+| email        | string   | unique email                 |
+| password     | string   | hashed password              |
+| first_name   | string   | the user's first name        |
+| last_name    | string   | the user's last name         |
+| is_active    | boolean  | is the user active           |
+| is_superuser | boolean  | is the user a superuser      |
+| is_staff     | boolean  | is the user staff            |
 
-- **Feedback endpoints**
+### **[Profile](#models)**
 
-  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/products/<uuid>/feedbacks`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>/feedbacks`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/products/<uuid>/feedbacks/<uuid>`
-  - [x] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/products/<uuid>/feedbacks/<uuid>`
+The `Profile` model is used to store additional information about the users of the application.
 
-- **Authentication endpoints**
+| Field      | Type          | Description                                 |
+| ---------- | ------------- | ------------------------------------------- |
+| id         | uuid          | The profile's ID                            |
+| created_at | date          | when the profile was created                |
+| updated_at | date          | when the profile was last updated           |
+| user       | OneToOneField | The user associated with the profile        |
+| phone      | string        | The user's phone number                     |
+| avatar     | image         | The user's avatar                           |
+| role       | string        | The user's role (customer - vendor - admin) |
+| note       | text          | A note about the user                       |
 
-  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/register`
-  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/login`
-  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/logout`
-  - [ ] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/auth/refresh`
-  - [ ] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/auth/me`
-  - [ ] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/auth/me`
-  - [ ] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/auth/me/password`
+### **[Division](#models)**
 
-- **Cart endpoints**
+The `Division` model is used to store information about the divisions available in the application.
 
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/cart`
-  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart`
-  - [x] <span style="border-radius: 2px; background-color: #addd; color: white;">PUT</span> `/api/v1/cart`
-  - [x] <span style="border-radius: 2px; background-color: red; color: white;">DELETE</span> `/api/v1/cart`
-  - [x] <span style="border-radius: 2px; background-color: #faaf; color: white;">POST</span> `/api/v1/cart/checkout`
+| Field      | Type   | Description                        |
+| ---------- | ------ | ---------------------------------- |
+| id         | uuid   | The division's ID                  |
+| created_at | date   | when the division was created      |
+| updated_at | date   | when the division was last updated |
+| name       | string | The division's name                |
+| code       | string | The division's code                |
 
-- **Orders endpoints**
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/\<uuid>`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/<uuid>/cancel`
-  - [x] <span style="border-radius: 2px; background-color: green; color: white;">GET</span> `/api/v1/orders/<uuid>/return`
+### **[Category](#models)**
 
-#### GET /api/v1/products
+The `Category` model is used to store information about the categories available in the application (e.g. Dress, hijab, ...).
 
-- Description: List all products for the user
-- Request: `GET /api/products`
-  - Body: empty
-  - Query: `page=<int>&division=<uuid>&category=<uuid>&color=<uuid>&size=<uuid>&min_price=<float>&max_price=<float>&search=<string>`
-- Response: 200
-- Response body: list of products
+| Field       | Type                 | Description                        |
+| ----------- | -------------------- | ---------------------------------- |
+| id          | uuid                 | The category's ID                  |
+| created_at  | date                 | when the category was created      |
+| updated_at  | date                 | when the category was last updated |
+| division_id | ForeignKey(Division) | The category's division ID         |
+| name        | string               | The category's name                |
+| description | text                 | The category's description         |
 
-```json
-{
-  "count": 34,
-  "next": "http://maryema.ae/api/products-list/?page=2",
-  "previous": null,
-  "results": [
+### **[Product](#models)**
+
+The `Product` model is used to store information about the products available in the application.
+
+| Field       | Type                 | Description                                     |
+| ----------- | -------------------- | ----------------------------------------------- |
+| id          | uuid                 | The product's ID                                |
+| created_at  | datetime             | when the product was created                    |
+| updated_at  | datetime             | when the product was last updated               |
+| category_id | ForeignKey(Category) | The product's category ID                       |
+| name        | string               | The product's name                              |
+| description | text                 | The product's description                       |
+| tags        | string               | list of tags separated by comma used for search |
+| vendor_id   | uuid                 | The product's vendor ID (profile_id)            |
+
+### **[Color](#models)**
+
+The `Color` model is used to store information about the colors available in the application.
+
+| Field      | Type   | Description                                 |
+| ---------- | ------ | ------------------------------------------- |
+| id         | uuid   | The color's ID                              |
+| created_at | date   | when the color was created                  |
+| updated_at | date   | when the color was last updated             |
+| name       | string | The color's name                            |
+| value      | string | The color's value (hex code, e.g., #ffffff) |
+
+### **[Size](#models)**
+
+The `Size` model is used to store information about the sizes available in the application.
+
+| Field      | Type   | Description                    |
+| ---------- | ------ | ------------------------------ |
+| id         | uuid   | The size's ID                  |
+| created_at | date   | when the size was created      |
+| updated_at | date   | when the size was last updated |
+| name       | string | The size's name                |
+
+### **[Img](#models)**
+
+The `Img` model is used to store information about the images available in the application.
+
+| Field      | Type | Description                     |
+| ---------- | ---- | ------------------------------- |
+| id         | uuid | The image's ID                  |
+| created_at | date | when the image was created      |
+| updated_at | date | when the image was last updated |
+| src        | file | The image file                  |
+| alt        | text | The image's alt text            |
+| width      | int  | The image's width               |
+| height     | int  | The image's height              |
+
+### **[ProductVariant](#models)**
+
+The `ProductVariant` model is used to store information about the product variants available in the application.
+
+| Field      | Type                | Description                          |
+| ---------- | ------------------- | ------------------------------------ |
+| id         | uuid                | The product variant's ID             |
+| created_at | datetime            | when the product variant was created |
+| updated_at | datetime            | when the product variant was updated |
+| product_id | ForeignKey(Product) | product ID                           |
+| color_id   | ForeignKey(Color)   | color ID                             |
+| size_id    | ForeignKey(Size)    | size ID                              |
+| image_id   | ForeignKey(Image)   | image ID                             |
+| cost       | decimal             | cost price from vendor               |
+| price      | decimal             | price for customers                  |
+| quantity   | int                 | quantity in stock                    |
+| sort_order | int                 | number to be sorted with             |
+
+### **[Collection](#models)**
+
+The `Collection` model is used to store information about collections of products in the application.
+
+| Field       | Type                     | Description                              |
+| ----------- | ------------------------ | ---------------------------------------- |
+| id          | uuid                     | The collection's ID                      |
+| created_at  | datetime                 | when the product variant was created     |
+| updated_at  | datetime                 | when the product variant was updated     |
+| name        | string                   | The name of the collection               |
+| description | text                     | The description of the collection        |
+| products    | ManyToManyField(Product) | many-to-many relation with Product model |
+
+### **[Feedback](#models)**
+
+The `Feedback` model is used tos tore the feedback (rate and comment) of a customer on a product.
+
+| Field      | Type                | Description                                               |
+| ---------- | ------------------- | --------------------------------------------------------- |
+| id         | uuid                | The feedback's ID                                         |
+| created_at | datetime            | when the product variant was created                      |
+| updated_at | datetime            | when the product variant was updated                      |
+| customer   | ForeignKey(Profile) | the id of the customer (profile_id)                       |
+| product    | ForeignKey(Product) | the id of the product                                     |
+| rate       | int                 | the rate of the product given by the customer (1-5 stars) |
+| comment    | text                | the comment of the customer on the product                |
+
+### **[DiscountRule](#models)**
+
+The `DiscountRule` model is used to store information about the discount rules available in the application.
+
+| Field                                      | Type                             | Description                                                                     |
+| ------------------------------------------ | -------------------------------- | ------------------------------------------------------------------------------- |
+| id                                         | uuid                             | The discount rule's ID                                                          |
+| created_at                                 | datetime                         | when the discount rule was created                                              |
+| updated_at                                 | datetime                         | when the discount rule was updated                                              |
+| starts_at                                  | datetime                         | when the discount rule starts                                                   |
+| ends_at                                    | datetime                         | when the discount rule ends                                                     |
+| title                                      | string                           | The title of the discount rule                                                  |
+| value_type                                 | string                           | The type of the discount value (fixed_amount, percentage)                       |
+| value                                      | decimal                          | The value of the discount                                                       |
+| customer_selection                         | string                           | The customer selection method (prerequisite, all)                               |
+| prerequisite_customer_ids                  | list[ForeignKey(Profile)]        | The customers that must have the discount                                       |
+| target_selection                           | string                           | The target selection method (entitled, all)                                     |
+| entitled_collection_ids                    | list[ForeignKey(Collection)]     | The collections to which the discount is applied                                |
+| entitled_product_ids                       | list[ForeignKey(Product)]        | The products to which the discount is applied                                   |
+| entitled_variant_ids                       | list[ForeignKey(ProductVariant)] | The variants to which the discount is applied                                   |
+| prerequisite_collection_ids                | list[ForeignKey(Collection)]     | The collections required for the discount                                       |
+| prerequisite_product_ids                   | list[ForeignKey(Product)]        | The products required for the discount                                          |
+| prerequisite_variant_ids                   | list[ForeignKey(ProductVariant)] | The variants required for the discount                                          |
+| prerequisite_subtotal_range                | int                              | The subtotal range required for the discount (less than or equal to this value) |
+| prerequisite_quantity_range                | int                              | The quantity range required for the discount (less than or equal to this value) |
+| prerequisite_to_entitlement_quantity_ratio | dict                             | The prerequisite to entitlement quantity ratio                                  |
+| prerequisite_to_entitlement_purchase       | dict                             | The prerequisite to entitlement purchase amount                                 |
+| once_per_customer                          | boolean                          | Is the discount once per customer                                               |
+| usage_limit                                | int                              | The maximum number of times the price rule can be used, per discount code.      |
+| allocation_method                          | string                           | The allocation method (each, across)                                            |
+| allocation_limit                           | int                              | The allocation limit of the discount                                            |
+
+### **[DiscountCode](#models)**
+
+The `DiscountCode` model is used to store information about the discount codes available in the application.
+
+| Field         | Type                     | Description                                |
+| ------------- | ------------------------ | ------------------------------------------ |
+| id            | uuid                     | The discount code's ID                     |
+| created_at    | datetime                 | when the discount code was created         |
+| updated_at    | datetime                 | when the discount code was updated         |
+| code          | string                   | The discount code                          |
+| starts_at     | datetime                 | when the discount code starts              |
+| ends_at       | datetime                 | when the discount code ends                |
+| usage_count   | int                      | The number of times this code is used      |
+| discount_rule | ForeignKey(DiscountRule) | The discount rule associated with the code |
+
+### **[Cart](#models)**
+
+The `Cart` model is used to store information about the cart of a customer.
+
+| Field         | Type                | Description                                                        |
+| ------------- | ------------------- | ------------------------------------------------------------------ |
+| id            | uuid                | The cart's id                                                      |
+| created_at    | datetime            | when the product variant was created                               |
+| updated_at    | datetime            | when the product variant was updated                               |
+| customer      | ForeignKey(Profile) | the id of the customer (profile_id)                                |
+| total         | decimal             | the total price of the cart                                        |
+| is_active     | boolean             | is the cart active                                                 |
+| last_updated  | datetime            | to track cart activity (e.g. the time at which last item is added) |
+| discount_code | uuid                | the id of the discount code                                        |
+
+### **[CartItem](#models)**
+
+The `CartItem` model is used to store the product variants and its quantity in specific cart.
+
+| Field           | Type                       | Description                          |
+| --------------- | -------------------------- | ------------------------------------ |
+| id              | uuid                       | The cart's id                        |
+| created_at      | datetime                   | when the product variant was created |
+| updated_at      | datetime                   | when the product variant was updated |
+| cart            | ForeignKey(Cart)           | the id of the cart                   |
+| product_variant | ForeignKey(ProductVariant) | the id of the product variant        |
+| quantity        | int                        | the quantity of the product variant  |
+| subtotal        | decimal                    | the subtotal price of the item       |
+
+### **[Order](#models)**
+
+The `Order` model is used to store information about the orders of the customers.
+
+| Field         | Type                | Description                         |
+| ------------- | ------------------- | ----------------------------------- |
+| id            | uuid                | The order's id                      |
+| created_at    | datetime            | when the order was created          |
+| updated_at    | datetime            | when the order was updated          |
+| customer      | ForeignKey(Profile) | the id of the customer (profile_id) |
+| total         | decimal             | the total price of the order        |
+| status        | string              | the status of the order             |
+| discount_code | uuid                | the id of the discount code         |
+
+### **[OrderItem](#models)**
+
+The `OrderItem` model is used to store the product variants and its quantity in specific order.
+
+| Field           | Type                       | Description                          |
+| --------------- | -------------------------- | ------------------------------------ |
+| id              | uuid                       | The order's id                       |
+| created_at      | datetime                   | when the product variant was created |
+| updated_at      | datetime                   | when the product variant was updated |
+| order           | ForeignKey(Order)          | the id of the order                  |
+| product_variant | ForeignKey(ProductVariant) | the id of the product variant        |
+| quantity        | int                        | the quantity of the product variant  |
+| subtotal        | decimal                    | the subtotal price of the item       |
+
+## **Views**
+
+### **Customer**
+
+The `Customer` view is used to display information about the customers of the application.
+
+- #### **GET** `api/admin/customers/`
+
+  This endpoint returns a list of all customers.
+
+  **Response**
+
+  ```json
+  [
     {
       "id": 1,
-      "created_at": "2021-01-01T00:00:00Z",
-      "name": "Product 1",
-      "category": {
-        "id": 1,
-        "name": "Category 1"
-      },
-      "display_price": 100,
-      "display_image": "product1.jpg",
-      "description": "Product 1 description",
-      "average_rating": 4.5
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "davem",
+      "email": "bob.norman@mail.example.com",
+      "first_name": "John",
+      "last_name": "Norman",
+      "is_active": true,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T08:48:27-04:00",
+        "phone": "01152869950",
+        "avatar": "http://example.com/avatar.jpg",
+        "role": "customer",
+        "note": "This is a note about the user."
+      }
     }
   ]
-}
-```
+  ```
 
-### GET /api/products/<uuid>
+- #### **GET** `api/admin/customers/{id}/`
 
-- Description: Get a product by id
-- Request: `GET /api/products/<uuid>`
-  - Body: empty
-  - Params: `uuid` - product id
-  - Query: empty
-- Response: 200
-- Response body: product
+  This endpoint returns information about a specific customer.
 
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "created_at": "2021-01-01T00:00:00Z",
-  "name": "Product 1",
-  "category": {
-    "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-    "name": "Category 1"
-  },
-  "description": "Product 1 description",
-  "average_rating": 4.5,
-  "colors": [
-    {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "color1_name": "Red",
-      "color1_value": "#FF0000",
-      "color2_name": "Blue",
-      "color2_value": "#0000FF",
-      "image": "product1.jpg",
-      "stocks": [
-        {
-          "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-          "size": {
-            "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-            "name": "S"
-          },
-          "quantity": 10,
-          "price": 100
-        },
-        {
-          "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-          "size": {
-            "id": 2,
-            "name": "M"
-          },
-          "quantity": 10,
-          "price": 100
-        }
-      ]
-    }
-  ],
-  "feedbacks": [
-    {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "created_at": "2021-01-01T00:00:00Z",
-      "customer": {
-        "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-        "username": "user1",
-        "avatar": "user1.jpg"
-      },
-      "rating": 4.5,
-      "comment": "Product 1 feedback"
-    },
-    {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "created_at": "2021-01-01T00:00:00Z",
-      "customer": {
-        "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-        "username": "user2",
-        "avatar": "user2.jpg"
-      },
-      "rating": 4.5,
-      "comment": "Product 1 feedback"
-    }
-  ]
-}
-```
+  **Response**
 
-### POST /api/products/<uuid>/feedbacks
-
-- Description: Create a feedback for a product
-- Request: `POST /api/products/<uuid>/feedbacks`
-  - Body:
-    - `rating` (float): rating of the product
-    - `comment` (string): comment of the product
-- Response: 201
-- Response body: feedback
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "created_at": "2021-01-01T00:00:00Z",
-  "customer": {
-    "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-    "username": "user1",
-    "avatar": "user1.jpg"
-  },
-  "rating": 4.5,
-  "comment": "Product 1 feedback"
-}
-```
-
-### GET /api/products/<uuid>/feedbacks
-
-- Description: List all feedbacks for a product
-- Request: `GET /api/products/<uuid>/feedbacks`
-  - Body: empty
-  - Params: `uuid` - product id
-  - Query: empty
-- Response: 200
-- Response body: list of feedbacks
-
-```json
-[
+  ```json
   {
-    "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-    "created_at": "2021-01-01T00:00:00Z",
-    "customer": {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "username": "user1",
-      "avatar": "user1.jpg"
-    },
-    "rating": 4.5,
-    "comment": "Product 1 feedback"
+    "id": 1,
+    "created_at": "2013-06-27T08:48:27-04:00",
+    "last_login": "2012-08-24T14:01:46-04:00",
+    "username": "davem",
+    "email": "bob.norman@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": true,
+    "profile": {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "created_at": "2024-12-21T08:48:27-04:00",
+      "updated_at": "2024-12-21T08:48:27-04:00",
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "role": "customer",
+      "note": "This is a note about the user."
+    }
   }
-]
-```
+  ```
 
-### POST /api/auth/register
+- #### **POST** `api/admin/customers/`
 
-- Description: Register a new user
-- Request: `POST /api/auth/register`
-  - Body:
-    - `username` (string): username of the user
-    - `email` (string): email of the user
-    - `password` (string): password of the user
-    - `first_name` (string): first name of the user
-    - `last_name` (string): last name of the user
-    - `avatar` (string): avatar of the user
-    - `phone_number` (string): phone of the user
-- Response: 201
-- Response body: user
+  This endpoint creates a new customer.
 
-```json
-{
-  "detail": "User created successfully"
-}
-```
+  **Request**
 
-### POST /api/auth/login
-
-- Description: Login a user
-- Request: `POST /api/auth/login`
-  - Body:
-    - `username` (string): username of the user
-    - `password` (string): password of the user
-- Response: 200
-- Response Headers:
-  - `Set-Cookie: access_token=<string>; HttpOnly; Secure; SameSite=None; Max-Age=<int>`
-  - `Set-Cookie: refresh_token=<string>; HttpOnly; Secure; SameSite=None; Max-Age=<int>`
-- Response body: user
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "username": "user1",
-  "email": "[email protected]",
-  "first_name": "User",
-  "last_name": "One",
-  "avatar": "user1.jpg",
-  "phone_number": "1234567890"
-}
-```
-
-### POST /api/auth/logout
-
-- Description: Logout a user
-- Request: `POST /api/auth/logout`
-  - Body: empty
-- Response: 200
-- Response Headers:
-  - `Set-Cookie: access_token=; HttpOnly; Secure; SameSite=None; Max-Age=0`
-  - `Set-Cookie: refresh_token=; HttpOnly; Secure; SameSite=None; Max-Age=0`
-- Response body: empty
-
-```json
-{}
-```
-
-### POST /api/auth/refresh
-
-- Description: Refresh a user token
-- Request: `POST /api/auth/refresh`
-  - Body: empty
-  - Cookies:
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response Headers:
-  - `Set-Cookie: access_token=<string>; HttpOnly; Secure; SameSite=None; Max-Age=<int>`
-- Response body: empty
-
-```json
-{}
-```
-
-### GET /api/auth/me
-
-- Description: Get the current user
-- Request: `GET /api/auth/me`
-  - Body: empty
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: user
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "username": "user1",
-  "email": "[email protected]",
-  "first_name": "User",
-  "last_name": "One",
-  "avatar": "user1.jpg",
-  "phone_number": "1234567890"
-}
-```
-
-### PATCH /api/auth/me
-
-- Description: Update the current user
-- Request: `PATCH /api/auth/me`
-  - Body:
-    - `username` (string): username of the user
-    - `email` (string): email of the user
-    - `first_name` (string): first name of the user
-    - `last_name` (string): last name of the user
-    - `avatar` (string): avatar of the user
-    - `phone_number` (string): phone of the user
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: user
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "username": "user1",
-  "email": "[email protected]",
-  "first_name": "User",
-  "last_name": "One",
-  "avatar": "user1.jpg",
-  "phone_number": "1234567890"
-}
-```
-
-### PATCH /api/auth/me/password
-
-- Description: Update the current user password
-- Request: `PATCH /api/auth/me/password`
-  - Body:
-    - `old_password` (string): old password of the user
-    - `new_password` (string): new password of the user
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: empty
-
-```json
-{}
-```
-
-### GET /api/cart
-
-- Description: Get the current user active cart
-- Request: `GET /api/cart`
-  - Body: empty
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: cart
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "created_at": "2021-01-01T00:00:00Z",
-  "products": [
-    {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "name": "Product 1",
-      "color": {
-        "color1_name": "Red",
-        "color1_value": "#FF0000",
-        "color2_name": "Blue",
-        "color2_value": "#0000FF",
-        "image": "product1.jpg"
-      },
-      "size": {
-        "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-        "name": "S"
-      },
-      "quantity": 1,
-      "price": 100
+  ```json
+  {
+    "username": "davem",
+    "email": "bob.norman@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": true,
+    "profile": {
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "role": "customer",
+      "note": "This is a note about the user."
     }
-  ],
-  "total_price": 100
-}
-```
+  }
+  ```
 
-### POST /api/cart
+  **Response**
 
-- Description: Add a product to the current user active cart
-- Request: `POST /api/cart`
-  - Body:
-    - `product_id` (uuid): product id
-    - `quantity` (int): quantity of the product
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 201
-- Response body: message
+  - Status: `201 Created`
+  - body:
 
-```json
-{
-  "detail": "Product added to cart successfully"
-}
-```
-
-### PATCH /api/cart
-
-- Description: Update a product in the current user active cart
-- Request: `PATCH /api/cart`
-  - Body:
-    - `product_id` (uuid): product id
-    - `quantity` (int): quantity of the product
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: cart
-
-```json
-{
-  "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-  "created_at": "2021-01-01T00:00:00Z",
-  "products": [
+    ```json
     {
-      "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-      "name": "Product 1",
-      "color": {
-        "color1_name": "Red",
-        "color1_value": "#FF0000",
-        "color2_name": "Blue",
-        "color2_value": "#0000FF",
-        "image": "product1.jpg"
-      },
-      "size": {
-        "id": "9a8fe99b-4e42-4f96-bcc5-f0cbb0e30c9f",
-        "name": "S"
-      },
-      "quantity": 2,
-      "price": 100
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "davem",
+      "email": "bob.norman@mail.example.com",
+      "first_name": "John",
+      "last_name": "Norman",
+      "is_active": true,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T08:48:27-04:00",
+        "phone": "01152869950",
+        "avatar": "http://example.com/avatar.jpg",
+        "role": "customer",
+        "note": "This is a note about the user."
+      }
     }
-  ],
-  "total_price": 200
-}
-```
+    ```
 
-### DELETE /api/cart
+- #### **PUT** `api/admin/customers/{id}/`
 
-- Description: Delete a product from the current user active cart
-- Request: `DELETE /api/cart`
-  - Body:
-    - `product_id` (uuid): product id
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: message
+  This endpoint updates information about a specific customer.
 
-```json
-{
-  "detail": "Product deleted from cart successfully"
-}
-```
+  **Request**
 
-### POST /api/checkout
+  ```json
+  {
+    "username": "new.username",
+    "email": "new_email@mail.example.com",
+    "first_name": "New",
+    "last_name": "Name",
+    "is_active": false,
+    "profile": {
+      "phone": "01052869950",
+      "avatar": "http://example.com/avatar2.jpg",
+      "note": "This is a note about the user. Updated."
+    }
+  }
+  ```
 
-- Description: Checkout the current user active cart
-- Request: `POST /api/cart/checkout`
-  - Body: empty
-  - Cookies:
-    - `access_token` (string): access token
-    - `refresh_token` (string): refresh token
-- Response: 200
-- Response body: order
+  **Response**
+
+  - Status: `200 OK`
+  - body:
+
+    ```json
+    {
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "new.username",
+      "email": "new_email@mail.example.com",
+      "first_name": "New",
+      "last_name": "Name",
+      "is_active": false,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T09:51:27-04:00",
+        "phone": "01052869950",
+        "avatar": "http://example.com/avatar2.jpg",
+        "role": "customer",
+        "note": "This is a note about the user. Updated."
+      }
+    }
+    ```
+
+- #### **DELETE** `api/admin/customers/{id}/`
+
+  This endpoint deletes a specific customer.
+
+  **Response**
+
+  - Status: `204 No Content`
+
+### **Vendor**
+
+The `Vendor` view is used to display information about the vendors of the application.
+
+- #### **GET** `api/admin/vendors/`
+
+  This endpoint returns a list of all vendors.
+
+  **Response**
+
+  ```json
+  [
+    {
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "davem",
+      "email": "davendor@mail.example.com",
+      "first_name": "John",
+      "last_name": "Norman",
+      "is_active": false,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T08:48:27-04:00",
+        "phone": "01152869950",
+        "avatar": "http://example.com/avatar.jpg",
+        "role": "vendor",
+        "note": "This is a note about the user."
+      }
+    }
+  ]
+  ```
+
+- #### **GET** `api/admin/vendors/{id}/`
+
+  This endpoint returns information about a specific vendor.
+
+  **Response**
+
+  ```json
+  {
+    "id": 1,
+    "created_at": "2013-06-27T08:48:27-04:00",
+    "last_login": "2012-08-24T14:01:46-04:00",
+    "username": "davem",
+    "email": "davendor@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": false,
+    "profile": {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "created_at": "2024-12-21T08:48:27-04:00",
+      "updated_at": "2024-12-21T08:48:27-04:00",
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "role": "vendor",
+      "note": "This is a note about the user."
+    }
+  }
+  ```
+
+- #### **POST** `api/admin/vendors/`
+
+  This endpoint creates a new vendor.
+
+  **Request**
+
+  ```json
+  {
+    "username": "davem",
+    "email": "davendor@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": false,
+    "profile": {
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "note": "This is a note about the user."
+    }
+  }
+  ```
+
+- #### **PUT** `api/admin/vendors/{id}/`
+
+  This endpoint updates information about a specific customer.
+
+  **Request**
+
+  ```json
+  {
+    "username": "new.username",
+    "email": "davendor2@mail.example.com",
+    "first_name": "New",
+    "last_name": "Vendor",
+    "is_active": true,
+    "profile": {
+      "phone": "01252869950",
+      "avatar": "http://example.com/avatar2.jpg",
+      "note": "This is a note about the user. Updated."
+    }
+  }
+  ```
+
+  **Response**
+
+  - Status: `200 OK`
+  - body:
+
+    ```json
+    {
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "new.username",
+      "email": "davendor2@mail.example.com",
+      "first_name": "New",
+      "last_name": "Vendor",
+      "is_active": true,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T09:51:27-04:00",
+        "phone": "01252869950",
+        "avatar": "http://example.com/avatar2.jpg",
+        "note": "This is a note about the user. Updated."
+      }
+    }
+    ```
+
+- #### **DELETE** `api/admin/vendors/{id}/`
+
+  This endpoint deletes a specific vendor.
+
+  **Response**
+
+  - Status: `204 No Content`
+
+### **Admin**
+
+The `Admin` view is used to display information about the admins of the application.
+
+- #### **GET** `api/admin/admins/`
+
+  This endpoint returns a list of all admins.
+
+  **Response**
+
+  ```json
+  [
+    {
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "davem",
+      "email": "davendor@mail.example.com",
+      "first_name": "John",
+      "last_name": "Norman",
+      "is_active": true,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T08:48:27-04:00",
+        "phone": "01152869950",
+        "avatar": "http://example.com/avatar.jpg",
+        "role": "admin",
+        "note": "This is a note about the user."
+      }
+    }
+  ]
+  ```
+
+- #### **GET** `api/admin/admins/{id}/`
+
+  This endpoint returns information about a specific admin.
+
+  **Response**
+
+  ```json
+  {
+    "id": 1,
+    "created_at": "2013-06-27T08:48:27-04:00",
+    "last_login": "2012-08-24T14:01:46-04:00",
+    "username": "davem",
+    "email": "davendor@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": true,
+    "profile": {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "created_at": "2024-12-21T08:48:27-04:00",
+      "updated_at": "2024-12-21T08:48:27-04:00",
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "role": "admin",
+      "note": "This is a note about the user."
+    }
+  }
+  ```
+
+- #### **POST** `api/admin/admins/`
+
+  This endpoint creates a new admin.
+
+  **Request**
+
+  ```json
+  {
+    "username": "davem",
+    "email": "davendor@mail.example.com",
+    "first_name": "John",
+    "last_name": "Norman",
+    "is_active": true,
+    "profile": {
+      "phone": "01152869950",
+      "avatar": "http://example.com/avatar.jpg",
+      "note": "This is a note about the user."
+    }
+  }
+  ```
+
+- #### **PUT** `api/admin/admins/{id}/`
+
+  This endpoint updates information about a specific admin.
+
+  **Request**
+
+  ```json
+  {
+    "username": "new.username",
+    "email": "davendor2@mail.example.com",
+    "first_name": "New",
+    "last_name": "Vendor",
+    "is_active": false,
+    "profile": {
+      "phone": "01252869950",
+      "avatar": "http://example.com/avatar2.jpg",
+      "note": "This is a note about the user. Updated."
+    }
+  }
+  ```
+
+  **Response**
+
+  - Status: `200 OK`
+  - body:
+
+    ```json
+    {
+      "id": 1,
+      "created_at": "2013-06-27T08:48:27-04:00",
+      "last_login": "2012-08-24T14:01:46-04:00",
+      "username": "new.username",
+      "email": "davendor2@mail.example.com",
+      "first_name": "New",
+      "last_name": "Vendor",
+      "is_active": false,
+      "profile": {
+        "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+        "created_at": "2024-12-21T08:48:27-04:00",
+        "updated_at": "2024-12-21T09:51:27-04:00",
+        "phone": "01252869950",
+        "avatar": "http://example.com/avatar2.jpg",
+        "note": "This is a note about the user. Updated."
+      }
+    }
+    ```
+
+- #### **DELETE** `api/admin/admins/{id}/`
+
+  This endpoint deletes a specific admin.
+
+  **Response**
+
+  - Status: `204 No Content`

@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Cart",
+            name="Order",
             fields=[
                 (
                     "id",
@@ -26,30 +26,34 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
-                    "is_active",
-                    models.BooleanField(
-                        default=True,
-                        help_text="True if cart is active, False if cart is inactive",
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pending"),
+                            ("PROSSISSING", "Prossissing"),
+                            ("CLOSED", "Closed"),
+                            ("FULLFILLED", "Fullfilled"),
+                            ("CANCELED", "Canceled"),
+                        ],
+                        default="PENDING",
+                        max_length=20,
                     ),
                 ),
-                ("note", models.TextField(blank=True, default="")),
                 (
-                    "cost",
-                    models.DecimalField(
-                        decimal_places=2,
-                        default=0,
-                        help_text="The estimated cost that the buyer will pay at checkout, including subtotals, discounts, and total amounts.",
-                        max_digits=10,
-                    ),
+                    "total",
+                    models.DecimalField(decimal_places=2, default=0.0, max_digits=8),
                 ),
+                ("close_reason", models.TextField(blank=True, default="")),
             ],
             options={
-                "verbose_name_plural": "Carts",
-                "db_table": "cart",
+                "verbose_name": "Order",
+                "verbose_name_plural": "Orders",
+                "db_table": "orders",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name="CartItem",
+            name="OrderItem",
             fields=[
                 (
                     "id",
@@ -65,9 +69,10 @@ class Migration(migrations.Migration):
                 ("quantity", models.PositiveIntegerField(default=1)),
             ],
             options={
-                "verbose_name": "Cart Item",
-                "verbose_name_plural": "Cart Items",
-                "db_table": "cart_item",
+                "verbose_name": "Order Item",
+                "verbose_name_plural": "Order Items",
+                "db_table": "order_items",
+                "ordering": ["-created_at"],
             },
         ),
     ]
