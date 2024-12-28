@@ -1,7 +1,7 @@
 """ This module defines the models for profile app
 """
 
-import random
+import uuid
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -9,10 +9,9 @@ from django.db import models
 from core.models import BaseModel
 
 
-def default_avatar() -> str:
-    """returns a random avatar url"""
-    random_number = random.randint(51, 100)
-    return f"https://avatar.iran.liara.run/public/{random_number}"
+def default_avatar(id: uuid.UUID) -> str:
+    """returns a random avatar url between 51 and 100 based on the id"""
+    return f"https://avatar.iran.liara.run/public/{51 + (id.int % 50)}"
 
 
 class Profile(BaseModel):
@@ -31,7 +30,7 @@ class Profile(BaseModel):
         related_query_name="profile",
     )
     phone_number = models.CharField(max_length=15, blank=True, default="")
-    avatar = models.ImageField(upload_to="avatars/", default=default_avatar)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
     role = models.TextField(
         max_length=16, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER
     )
@@ -67,3 +66,7 @@ class Profile(BaseModel):
     @property
     def is_provider(self) -> bool:
         return self.role == self.RoleChoices.PROVIDER
+
+    @property
+    def avatar_url(self) -> str:
+        return self.avatar.url if self.avatar else default_avatar(self.id)
