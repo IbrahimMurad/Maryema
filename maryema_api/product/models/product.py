@@ -34,7 +34,7 @@ class Product(BaseModel):
     provider = models.ForeignKey(
         Profile,
         verbose_name="product provider",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="products",
         related_query_name="product",
         null=True,
