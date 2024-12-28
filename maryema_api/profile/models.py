@@ -1,17 +1,10 @@
 """ This module defines the models for profile app
 """
 
-import uuid
-
 from django.contrib.auth.models import User
 from django.db import models
 
 from core.models import BaseModel
-
-
-def default_avatar(id: uuid.UUID) -> str:
-    """returns a random avatar url between 51 and 100 based on the id"""
-    return f"https://avatar.iran.liara.run/public/{51 + (id.int % 50)}"
 
 
 class Profile(BaseModel):
@@ -69,4 +62,8 @@ class Profile(BaseModel):
 
     @property
     def avatar_url(self) -> str:
-        return self.avatar.url if self.avatar else default_avatar(self.id)
+        return (
+            self.avatar.url
+            if self.avatar
+            else f"https://avatar.iran.liara.run/public/{51 + (int(self.id) % 50)}"
+        )
