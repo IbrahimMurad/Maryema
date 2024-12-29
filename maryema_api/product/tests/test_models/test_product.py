@@ -27,7 +27,7 @@ class ProductModelTest(TestCase):
             user=self.user, role=Profile.RoleChoices.PROVIDER
         )
 
-    def test_product_creation(self):
+    def test_product_creation(self) -> None:
         """Test product creation"""
         product = Product.objects.create(
             category=self.category,
@@ -41,7 +41,7 @@ class ProductModelTest(TestCase):
         self.assertEqual(product.category, self.category)
         self.assertEqual(product.tags, "")
 
-    def test_str_representation(self):
+    def test_str_representation(self) -> None:
         """Test string representation"""
         product = Product.objects.create(
             category=self.category,
@@ -51,7 +51,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(str(product), "test product")
 
-    def test_product_creation_with_tags(self):
+    def test_product_creation_with_tags(self) -> None:
         """Test product creation with tags"""
         product = Product.objects.create(
             category=self.category,
@@ -62,7 +62,7 @@ class ProductModelTest(TestCase):
         )
         self.assertEqual(product.tags, "tag1, tag2, tag3")
 
-    def test_product_search_by_tag(self):
+    def test_product_search_by_tag(self) -> None:
         """Test product search by tag"""
         product = Product.objects.create(
             category=self.category,
@@ -74,7 +74,7 @@ class ProductModelTest(TestCase):
         self.assertEqual(Product.objects.filter(tags__contains="tag1").count(), 1)
         self.assertEqual(Product.objects.filter(tags__contains="tag2").first(), product)
 
-    def test_product_inheritance_from_basemodel(self):
+    def test_product_inheritance_from_basemodel(self) -> None:
         """Test product inheritance from BaseModel"""
         product = Product.objects.create(
             category=self.category,
@@ -89,7 +89,7 @@ class ProductModelTest(TestCase):
         self.assertIsNotNone(product.updated_at)
         self.assertIsInstance(product.updated_at, datetime)
 
-    def test_required_category(self):
+    def test_required_category(self) -> None:
         """Test required category"""
         with self.assertRaises(ValidationError):
             Product.objects.create(
@@ -98,7 +98,7 @@ class ProductModelTest(TestCase):
                 provider=self.provider,
             )
 
-    def test_required_name(self):
+    def test_required_name(self) -> None:
         """Test required name"""
         with self.assertRaises(ValidationError):
             Product.objects.create(
@@ -107,7 +107,7 @@ class ProductModelTest(TestCase):
                 provider=self.provider,
             )
 
-    def test_provider_must_be_provider_role(self):
+    def test_provider_must_be_provider_role(self) -> None:
         """Test provider profile has role equal to provider"""
         user = User.objects.create_user(
             username="test_user2", password="test_password", email="user2@test.com"
@@ -121,7 +121,7 @@ class ProductModelTest(TestCase):
                 provider=profile,
             )
 
-    def test_product_provider_relation(self):
+    def test_product_provider_relation(self) -> None:
         """Test product-provider relationship"""
         product = Product.objects.create(
             category=self.category,
@@ -133,7 +133,7 @@ class ProductModelTest(TestCase):
         self.assertEqual(self.provider.products.count(), 1)
         self.assertEqual(self.provider.products.first(), product)
 
-    def test_product_category_relation(self):
+    def test_product_category_relation(self) -> None:
         """Test product-category relationship"""
         product = Product.objects.create(
             category=self.category,
@@ -145,7 +145,7 @@ class ProductModelTest(TestCase):
         self.assertEqual(self.category.products.count(), 1)
         self.assertEqual(self.category.products.first(), product)
 
-    def test_product_category_deletion(self):
+    def test_product_category_deletion(self) -> None:
         """Test product deletion when category is deleted"""
         Product.objects.create(
             category=self.category,
@@ -156,7 +156,7 @@ class ProductModelTest(TestCase):
         self.category.delete()
         self.assertEqual(Product.objects.count(), 0)
 
-    def test_product_provider_deletion(self):
+    def test_product_provider_deletion(self) -> None:
         """Test product deletion when provider is deleted"""
         product = Product.objects.create(
             category=self.category,

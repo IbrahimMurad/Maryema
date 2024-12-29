@@ -8,8 +8,6 @@ class Img(BaseModel):
 
     src = models.ImageField(upload_to="product_images")
     alt = models.CharField(max_length=255, blank=True, default="")
-    width = models.IntegerField(null=True, blank=True)
-    height = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Image"

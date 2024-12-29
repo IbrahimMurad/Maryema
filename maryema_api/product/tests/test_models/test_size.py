@@ -10,12 +10,12 @@ from product.models import Size
 class TestSizeModel(TestCase):
     """A test case for Size model"""
 
-    def test_str(self):
+    def test_str(self) -> None:
         """Test string representation"""
         size = Size.objects.create(name="XL")
         self.assertEqual(str(size), "XL")
 
-    def test_required_name(self):
+    def test_required_name(self) -> None:
         """test required name field (not null and not blank)"""
         size = Size()
         with self.assertRaises(ValidationError):
@@ -24,7 +24,7 @@ class TestSizeModel(TestCase):
         with self.assertRaises(ValidationError):
             size.save()
 
-    def test_size_inheritance_from_BaseModel(self):
+    def test_size_inheritance_from_BaseModel(self) -> None:
         """Ensure Size model inherit from BaseModel"""
         size = Size.objects.create(name="XXL")
         self.assertIsNotNone(size.id)
@@ -34,12 +34,12 @@ class TestSizeModel(TestCase):
         self.assertIsNotNone(size.updated_at)
         self.assertTrue(isinstance(size.updated_at, datetime))
 
-    def test_invalid_size(self):
+    def test_invalid_size(self) -> None:
         """Test invalid size"""
         with self.assertRaises(ValueError):
             Size.objects.create(name="Invalid Size")
 
-    def test_valide_sizes(self):
+    def test_valide_sizes(self) -> None:
         """Test valid size"""
         size = Size.objects.create(name="XL")
         self.assertEqual(size.name, "XL")
