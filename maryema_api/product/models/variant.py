@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models import BaseModel
@@ -8,13 +7,37 @@ from product.models import Color, Img, Product, Size
 class ProductVariant(BaseModel):
     """ProductVariant model for storing product variants"""
 
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE)
-    size = models.ForeignKey(Size, on_delete=models.CASCADE)
-    image = models.ForeignKey(Img, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="variants",
+        related_query_name="variant",
+    )
+    color = models.ForeignKey(
+        Color,
+        on_delete=models.SET_DEFAULT,
+        null=True,
+        default=None,
+        related_name="variants",
+        related_query_name="variant",
+    )
+    size = models.ForeignKey(
+        Size,
+        on_delete=models.SET_DEFAULT,
+        null=True,
+        default=None,
+        related_name="variants",
+        related_query_name="variant",
+    )
+    image = models.ForeignKey(
+        Img,
+        on_delete=models.PROTECT,
+        related_name="variants",
+        related_query_name="variant",
+    )
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    quantity = models.PositiveSmallIntegerField()
     sort_order = models.IntegerField(default=1)
 
     class Meta:
@@ -22,6 +45,20 @@ class ProductVariant(BaseModel):
         verbose_name_plural = "Product Variants"
         db_table = "variants"
         ordering = ["sort_order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "color", "size"], name="unique_variant"
+            ),
+            models.UniqueConstraint(
+                fields=["sort_order", "product"], name="unique_sort_order"
+            ),
+        ]
+
+    def clean(self, *args, **kwargs) -> None:
+        """Override the clean method to ensure price is greater than cost"""
+        if self.price and self.cost and self.price < self.cost:
+            raise ValueError("Price cannot be less than cost")
+        return super().clean()
 
     def __str__(self) -> str:
         return f"{str(self.product)} - {str(self.color)} - {str(self.size)}"
