@@ -16,7 +16,11 @@ class Color(BaseModel):
 
     color1_name = models.CharField(verbose_name="First color name", max_length=20)
     color1_value = models.CharField(
-        verbose_name="First color value", max_length=7, validators=[validate_color]
+        verbose_name="First color value",
+        max_length=7,
+        validators=[validate_color],
+        null=True,
+        blank=True,
     )
     color2_name = models.CharField(
         verbose_name="Second color name", max_length=20, null=True, blank=True
