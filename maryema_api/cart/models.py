@@ -13,7 +13,7 @@ from product.models import ProductVariant
 
 def is_customer(value: uuid.UUID) -> None:
     """Ensures that the cart is associated with a customer"""
-    if not Profile.objects.get(id=value).is_customer():
+    if not Profile.objects.get(id=value).is_customer:
         raise ValidationError("The cart must be associated with a customer")
 
 
@@ -60,6 +60,12 @@ class Cart(BaseModel):
         ]
 
 
+def is_active_cart(value: uuid.UUID) -> None:
+    """Ensures that the cart is active"""
+    if not Cart.objects.get(id=value).is_active:
+        raise ValidationError("The cart must be active")
+
+
 class CartItem(BaseModel):
     """CartItem model that represents an item in a cart
 
@@ -74,10 +80,14 @@ class CartItem(BaseModel):
     """
 
     cart = models.ForeignKey(
-        Cart, on_delete=models.CASCADE, related_name="items", related_query_name="item"
+        Cart,
+        on_delete=models.CASCADE,
+        related_name="items",
+        related_query_name="item",
+        validators=[is_active_cart],
     )
     product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveSmallIntegerField(default=1)
 
     class Meta:
         db_table = "cart_item"

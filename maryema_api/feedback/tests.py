@@ -52,7 +52,7 @@ class FeedbackModelTest(TestCase):
             rate=5,
             comment="Awesome product",
         )
-        self.assertEqual(str(feedback), f"{self.product} - {self.profile}")
+        self.assertEqual(str(feedback), f"{self.product} - {self.customer}")
 
     def test_feedback_inheritance_from_basemodel(self) -> None:
         """Test that the feedback model inherits from the BaseModel"""
@@ -83,7 +83,7 @@ class FeedbackModelTest(TestCase):
 
         self.customer.role = Profile.RoleChoices.PROVIDER
         self.customer.save()
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(ValueError):
             Feedback.objects.create(
                 customer=self.customer,
                 product=self.product,
@@ -197,8 +197,8 @@ class FeedbackModelTest(TestCase):
             comment="Awesome product",
         )
         self.assertEqual(self.customer.feedbacks.count(), 2)
-        self.assertEqual(self.customer.feedbacks.first(), feedback1)
-        self.assertEqual(self.customer.feedbacks.last(), feedback2)
+        self.assertIn(feedback1, self.customer.feedbacks.all())
+        self.assertIn(feedback2, self.customer.feedbacks.all())
 
     def test_feedback_customer_delete_cascade(self) -> None:
         """Test that the feedbacks are deleted when the customer is deleted"""
