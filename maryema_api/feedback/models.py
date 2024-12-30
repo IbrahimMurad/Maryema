@@ -4,7 +4,7 @@
 import uuid
 from profile.models import Profile
 
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator
 from django.db import models
 
 from core.models import BaseModel
@@ -46,8 +46,8 @@ class Feedback(BaseModel):
         related_query_name="feedback",
         help_text="The product that the feedback is for.",
     )
-    rate = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(5)],
+    rate = models.PositiveSmallIntegerField(
+        validators=[MaxValueValidator(5)],
         default=0,
         help_text="The rate of the product from 1 to 5 (stars). 0 means no rate.",
     )
@@ -68,8 +68,3 @@ class Feedback(BaseModel):
                 fields=["customer", "product"], name="unique_feedback"
             )
         ]
-
-    def save(self, *args, **kwargs):
-        """Override the save method to run a full clean before saving"""
-        self.full_clean()
-        super().save(*args, **kwargs)
