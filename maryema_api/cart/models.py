@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from core.models import BaseModel
+
+# from discount.models import DiscountCode
 from product.models import ProductVariant
 
 
@@ -32,7 +34,11 @@ class Cart(BaseModel):
     """
 
     customer = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, validators=[is_customer]
+        Profile,
+        on_delete=models.CASCADE,
+        validators=[is_customer],
+        related_name="carts",
+        related_query_name="cart",
     )
     is_active = models.BooleanField(
         default=True, help_text="True if cart is active, False if cart is inactive"
@@ -88,11 +94,18 @@ class CartItem(BaseModel):
     )
     product_variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=1)
+    # discount_codes = models.ManyToManyField(DiscountCode)
 
     class Meta:
         db_table = "cart_item"
         verbose_name = "Cart Item"
         verbose_name_plural = "Cart Items"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["cart", "product_variant"],
+                name="unique_cart_item",
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.product_variant} x {self.quantity} in {self.cart}"
