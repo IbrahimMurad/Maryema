@@ -3,6 +3,7 @@
 
 from profile.models import Profile
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from core.models import BaseModel
@@ -53,12 +54,18 @@ class Order(BaseModel):
     def __str__(self) -> str:
         return f"Order {self.id} - {self.customer.user.username}"
 
-    def save(self, *args, **kwargs):
+    def clean(self, *args, **kwargs):
         """Override the save method check if the order is closed when close reason is not blank"""
         if self.close_reason and self.status != self.StatusChoice.CLOSED:
             self.status = self.StatusChoice.CLOSED
-        self.full_clean()
-        super().save(*args, **kwargs)
+        if (
+            self.status == self.StatusChoice.PROSSISSING
+            or self.status == self.StatusChoice.FULLFILLED
+        ) and not self.items.exists():
+            raise ValidationError(
+                "Order must have at least one item to be processed or fullfilled"
+            )
+        super().clean(*args, **kwargs)
 
     class Meta:
         ordering = ["-created_at"]
