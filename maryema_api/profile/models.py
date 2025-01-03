@@ -62,8 +62,6 @@ class Profile(BaseModel):
 
     @property
     def avatar_url(self) -> str:
-        return (
-            self.avatar.url
-            if self.avatar
-            else f"https://avatar.iran.liara.run/public/{51 + (int(self.id) % 50)}"
-        )
+        if self.avatar:
+            return self.avatar.url
+        return f"https://avatar.iran.liara.run/public/{51 + (int(self.id) % 50)}"

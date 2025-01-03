@@ -15,7 +15,100 @@ This is the backend part of `maryema` web application.
 | **[User](https://docs.djangoproject.com/en/5.1/topics/auth/default/#user-objects)** | The default user model provided by Django. It is used to store information about the users. |
 | **[Profile](/profile/models.py#10)**                                                | Used to store additional information about the users of the application.                    |
 
-#### **Views (TO DO)**
+#### **Views**
+
+- List all users.
+  ```http
+  GET /api/admin/users/?
+  page=<int:page>&
+  search=<str:search>&
+  role=<str:role>&
+  is_active=<bool:is_active>
+  ```
+- Retrieve a specific user.
+  ```http
+  GET /api/admin/users/<int:id>/
+  ```
+- Create a new user.
+  ```http
+  POST /api/admin/users/
+  ```
+  ```json
+  {
+    "username": "user",
+    "email": "user@test.com",
+    "password": "password",
+    "first_name": "User",
+    "last_name": "Test",
+    "profile": {
+      "role": "customer",
+      "phone_number": "1234567890",
+      "avatar": "https://example.com/avatar.jpg",
+      "note": "A test note"
+    }
+  }
+  ```
+- Update an existing user.
+  ```http
+  PUT /api/admin/users/<int:id>/
+  PATCH /api/admin/users/<int:id>/
+  ```
+  ```json
+  {
+    "username": "user",
+    "email": "user@test.com",
+    "password": "password",
+    "first_name": "User",
+    "last_name": "Test",
+    "profile": {
+      "role": "customer",
+      "phone_number": "1234567890",
+      "avatar": "https://example.com/avatar.jpg",
+      "note": "A test note"
+    }
+  }
+  ```
+- Delete a user.
+  ```http
+  DELETE /api/admin/users/<int:id>/
+  ```
+- Get current user profile.
+  ```http
+  GET /api/me/
+  ```
+- Update current user profile.
+  ```http
+  PATCH /api/me/
+  ```
+  ```json
+  {
+    "username": "user",
+    "email": "user@test.com",
+    "password": "password",
+    "first_name": "User",
+    "last_name": "Test",
+    "profile": {
+      "role": "customer",
+      "phone_number": "1234567890",
+      "avatar": "https://example.com/avatar.jpg",
+      "note": "A test note"
+    }
+  }
+  ```
+- Delete current user.
+  ```http
+  DELETE /api/me/
+  ```
+- Change current user password
+  ```http
+  POST /api/me/change-password/
+  ```
+  ```json
+  {
+    "old_password": "old_password",
+    "new_password": "new_password"
+  }
+  ```
 
 ### **product**
 
