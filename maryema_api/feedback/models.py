@@ -1,7 +1,6 @@
 """ This module contains the models for the feedback app.
 """
 
-import uuid
 from profile.models import Profile
 
 from django.core.validators import MaxValueValidator
@@ -9,13 +8,6 @@ from django.db import models
 
 from core.models import BaseModel
 from product.models import Product
-
-
-def is_customer(value: uuid.UUID) -> None:
-    """A validator to ensure that the user is a customer"""
-    user = Profile.objects.get(pk=value)
-    if not user.is_customer:
-        raise ValueError("Only customers can give feedbacks.")
 
 
 class Feedback(BaseModel):
@@ -37,7 +29,6 @@ class Feedback(BaseModel):
         on_delete=models.CASCADE,
         related_name="feedbacks",
         related_query_name="feedback",
-        validators=[is_customer],
     )
     product = models.ForeignKey(
         Product,

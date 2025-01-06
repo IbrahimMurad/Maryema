@@ -2,6 +2,7 @@ from profile.models import Profile
 
 from rest_framework import serializers
 
+from feedback.serializers import FeedbackSerializer
 from product.models import (
     Category,
     Collection,
@@ -65,6 +66,7 @@ class ProductSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="product-detail", read_only=True
     )
+    feedback = FeedbackSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product

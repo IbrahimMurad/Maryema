@@ -1,5 +1,8 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from feedback.serializers import FeedbackSerializer
 from product.models import (
     Category,
     Collection,
@@ -52,6 +55,21 @@ class ImgViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    @action(methods=["GET", "POST"], detail=True, serializer_class=FeedbackSerializer)
+    def feedback(self, request, pk):
+        product = self.get_object()
+        if request.method == "POST":
+            serializer = FeedbackSerializer(
+                data=request.data, context={"request": request}
+            )
+            if serializer.is_valid():
+                serializer.save(product=product)
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+        feedbacks = product.feedbacks.all()
+        serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response(serializer.data)
 
 
 class VariantViewSet(viewsets.ModelViewSet):

@@ -9,6 +9,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from feedback.views import FeedbackViewSet
 from product.views import (
     CategoryViewSet,
     CollectionViewSet,
@@ -30,6 +31,7 @@ router.register("imgs", ImgViewSet, basename="img")
 router.register("products", ProductViewSet, basename="product")
 router.register("variants", VariantViewSet, basename="variant")
 router.register("collections", CollectionViewSet, basename="collection")
+router.register("feedback", FeedbackViewSet, basename="feedback")
 
 
 urlpatterns = [

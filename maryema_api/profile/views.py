@@ -3,9 +3,11 @@ from profile.serializers import UserSerializer
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import status, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from feedback.serializers import FeedbackSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -34,6 +36,16 @@ class UserViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=request.query_params["is_active"])
 
         serializer = UserSerializer(queryset, many=True, context={"request": request})
+        return Response(serializer.data)
+
+    @action(detail=True, serializer_class=FeedbackSerializer)
+    def feedback(self, request, pk):
+        """
+        List all the feedbacks for a user
+        """
+        user = self.get_object()
+        feedbacks = user.profile.feedbacks.all()
+        serializer = FeedbackSerializer(feedbacks, many=True)
         return Response(serializer.data)
 
 
