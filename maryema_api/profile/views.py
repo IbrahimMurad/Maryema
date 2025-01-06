@@ -93,7 +93,7 @@ class ChangePassword(APIView):
 def api_root(request):
     return Response(
         {
-            "admin-users": request.build_absolute_uri("admin/"),
+            "admin": request.build_absolute_uri("admin/"),
             "me": request.build_absolute_uri("me/"),
         }
     )

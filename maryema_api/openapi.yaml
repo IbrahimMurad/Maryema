@@ -1,0 +1,1120 @@
+openapi: "3.0.3"
+info:
+  title: "Maryema API"
+  version: "1.0"
+  description: "API documentation for Maryema application"
+
+servers:
+  - url: "https://127.0.0.1:8000/api"
+    description: "API base URL"
+
+tags:
+  - name: Current User
+    description: Operations about currently authenticated user
+  - name: User Management
+    description: Admin operations for managing users
+  - name: Products Management
+    description: Product management operations
+  - name: Product Variants Management
+    description: Product variant operations
+  - name: Collections Management
+    description: Product collections operations
+  - name: Divisions Management
+    description: Division management operations
+  - name: Categories Management
+    description: Category management operations
+  - name: Colors Management
+    description: Color management operations
+  - name: Sizes Management
+    description: Size management operations
+  - name: Images Management
+    description: Product image management operations
+
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [admin, customer, provider]
+          default: customer
+        phone_number:
+          type: string
+          pattern: ^01[012]\d{8}$
+        avatar:
+          type: string
+          format: uri
+          writeOnly: true
+          description: the avatar image field for create and update operations
+        avatar_url:
+          type: string
+          format: uri
+          pattern: ^https://avatar\.iran\.liara\.run/public/[5-9][0-9]$
+          readOnly: true
+          description: Avatar URL endpoint for src attribute in img tag
+        note:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/users/[0-9]$
+          readOnly: true
+          description: User profile details URL endpoint
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        first_name:
+          type: string
+        last_name:
+          type: string
+        is_active:
+          type: boolean
+        profile:
+          $ref: "#/components/schemas/Profile"
+      required:
+        - username
+        - email
+        - password
+
+    Division:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/divisions/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+          description: Division details URL endpoint
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - name
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/categories/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+          description: Category details URL endpoint
+        name:
+          type: string
+        division:
+          $ref: "#/components/schemas/Division"
+
+    Color:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/colors/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+          description: Color details URL endpoint
+        color1_name:
+          type: string
+        color1_value:
+          type: string
+          pattern: "^#(?:[0-9a-fA-F]{3}){1,2}$"
+        color2_name:
+          type: string
+        color2_value:
+          type: string
+          pattern: "^#(?:[0-9a-fA-F]{3}){1,2}$"
+      required:
+        - color1_name
+
+    Size:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/sizes/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+          description: Size details URL endpoint
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - name
+
+    Image:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/imgs/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+          description: Image details URL endpoint
+        src:
+          type: string
+          format: uri
+        alt:
+          type: string
+          default: ""
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+        - src
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/products/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: string
+        category:
+          $ref: "#/components/schemas/Category"
+        provider:
+          $ref: "#/components/schemas/Profile"
+      required:
+        - name
+        - category
+
+    CollectionRead:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          pattern: ^http://127\.0\.0\.1:8000/api/admin/collections/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+
+    CollectionWrite:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: string
+        products:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+        - name
+
+paths:
+  /me/:
+    get:
+      tags: [Current User]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Authentication required
+
+    patch:
+      tags: [Current User]
+      summary: Update current user profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid data
+        "401":
+          description: Authentication required
+
+    delete:
+      tags: [Current User]
+      summary: Delete current user account
+      responses:
+        "204":
+          description: Account deleted
+        "401":
+          description: Authentication required
+
+  /me/change-password/:
+    post:
+      tags: [Current User]
+      summary: Change user password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                new_password:
+                  type: string
+              required:
+                - old_password
+                - new_password
+      responses:
+        "204":
+          description: Password changed
+        "400":
+          description: Invalid old password
+
+  /admin/users/:
+    get:
+      tags: [User Management]
+      summary: List all users (admin only)
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: is_active
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+    post:
+      tags: [User Management]
+      summary: Create new user (admin only)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid data
+
+  /admin/users/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags: [User Management]
+      summary: Get user details (admin only)
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found
+
+    patch:
+      tags: [User Management]
+      summary: Partially update user details (admin only)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated
+        "400":
+          description: Invalid data
+        "404":
+          description: User not found
+
+    put:
+      tags: [User Management]
+      summary: Update user details (admin only)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User updated
+        "400":
+          description: Invalid data
+        "404":
+          description: User not found
+
+    delete:
+      tags: [User Management]
+      summary: Delete user account (admin only)
+      responses:
+        "204":
+          description: Account deleted
+        "404":
+          description: User not found
+
+  /admin/divisions/:
+    get:
+      tags: [Divisions Management]
+      summary: List all divisions
+      responses:
+        "200":
+          description: List of divisions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Division"
+    post:
+      tags: [Divisions Management]
+      summary: Create new division
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        "201":
+          description: Division created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Division"
+
+  /admin/divisions/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    get:
+      tags: [Divisions Management]
+      summary: Get division details
+      responses:
+        "200":
+          description: Division details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Division"
+    patch:
+      tags: [Divisions Management]
+      summary: Update division
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Division"
+      responses:
+        "200":
+          description: Division updated
+    delete:
+      tags: [Divisions Management]
+      summary: Delete division
+      responses:
+        "204":
+          description: Division deleted
+
+  /admin/categories/:
+    get:
+      tags: [Categories Management]
+      summary: List all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      tags: [Categories Management]
+      summary: Create new category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                division:
+                  type: string
+                  format: uuid
+              required:
+                - name
+                - division
+      responses:
+        "201":
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: Invalid data
+
+  /admin/categories/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Categories Management]
+      summary: Get category details
+      responses:
+        "200":
+          description: Category details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+    patch:
+      tags: [Categories Management]
+      summary: Update category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                division:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: Invalid data
+        "404":
+          description: Category not found
+    delete:
+      tags: [Categories Management]
+      summary: Delete category
+      responses:
+        "204":
+          description: Category deleted
+
+  /admin/colors/:
+    get:
+      tags: [Colors Management]
+      summary: List all colors
+      responses:
+        "200":
+          description: List of colors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Color"
+    post:
+      tags: [Colors Management]
+      summary: Create new color
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Color"
+      responses:
+        "201":
+          description: Color created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Color"
+
+  /admin/colors/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Colors Management]
+      summary: Get color details
+      responses:
+        "200":
+          description: Color details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Color"
+        "404":
+          description: Color not found
+    patch:
+      tags: [Colors Management]
+      summary: Update color
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Color"
+      responses:
+        "200":
+          description: Color updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Color"
+        "404":
+          description: Color not found
+    delete:
+      tags: [Colors Management]
+      summary: Delete color
+      responses:
+        "204":
+          description: Color deleted
+        "404":
+          description: Color not found
+
+  /admin/sizes/:
+    get:
+      tags: [Sizes Management]
+      summary: List all sizes
+      responses:
+        "200":
+          description: List of sizes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Size"
+    post:
+      tags: [Sizes Management]
+      summary: Create new size
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Size"
+      responses:
+        "201":
+          description: Size created
+
+  /admin/sizes/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Sizes Management]
+      summary: Get size details
+      responses:
+        "200":
+          description: Size details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Size"
+        "404":
+          description: Size not found
+    patch:
+      tags: [Sizes Management]
+      summary: Update size
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Size"
+      responses:
+        "200":
+          description: Size updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Size"
+        "404":
+          description: Size not found
+    delete:
+      tags: [Sizes Management]
+      summary: Delete size
+      responses:
+        "204":
+          description: Size deleted
+        "404":
+          description: Size not found
+
+  /admin/imgs/:
+    get:
+      tags: [Images Management]
+      summary: List all product images
+      responses:
+        "200":
+          description: List of images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Image"
+    post:
+      tags: [Images Management]
+      summary: Upload new image
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Image"
+      responses:
+        "201":
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+
+  /admin/imgs/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Images Management]
+      summary: Get image details
+      responses:
+        "200":
+          description: Image details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+    patch:
+      tags: [Images Management]
+      summary: Update image
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/Image"
+      responses:
+        "200":
+          description: Image updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+        "404":
+          description: Image not found
+    delete:
+      tags: [Images Management]
+      summary: Delete image
+      responses:
+        "204":
+          description: Image deleted
+        "404":
+          description: Image not found
+
+  /admin/products/:
+    get:
+      tags: [Products Management]
+      summary: List all products
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    post:
+      tags: [Products Management]
+      summary: Create a new product
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: string
+                category:
+                  type: string
+                  format: uuid
+                provider:
+                  type: string
+                  format: uuid
+      responses:
+        "201":
+          description: Create a new product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalide data
+
+  /admin/products/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Products Management]
+      summary: Get product details
+      responses:
+        "200":
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+    patch:
+      tags: [Products Management]
+      summary: Update product
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: string
+                category:
+                  type: string
+                  format: uuid
+                provider:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+    delete:
+      tags: [Products Management]
+      summary: Delete product
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          description: Product not found
+
+  /admin/collections/:
+    get:
+      tags: [Collections Management]
+      summary: List all collections
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CollectionRead"
+    post:
+      tags: [Collections Management]
+      summary: Create a new collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollectionWrite"
+      responses:
+        "201":
+          description: Collection created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionRead"
+        "400":
+          description: Invalid data
+
+  /admin/collections/{id}/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags: [Collections Management]
+      summary: Get collection details
+      responses:
+        "200":
+          description: Collection details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionRead"
+        "404":
+          description: Collection not found
+    patch:
+      tags: [Collections Management]
+      summary: Update collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: string
+
+      responses:
+        "200":
+          description: Collection updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionRead"
+        "400":
+          description: Invalid data
+        "404":
+          description: Collection not found
+    delete:
+      tags: [Collections Management]
+      summary: Delete collection
+      responses:
+        "204":
+          description: Collection deleted
+        "404":
+          description: Collection not found
+
+  /admin/collections/{id}/add/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Collections Management]
+      summary: Add product to collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: string
+                  format: uuid
+              required:
+                - product
+      responses:
+        "204":
+          description: Product added to collection
+        "400":
+          description: Invalid data
+        "404":
+          description: Collection or product not found
+
+  /admin/collections/{id}/remove/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+    post:
+      tags: [Collections Management]
+      summary: Remove product from collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: string
+                  format: uuid
+              required:
+                - product
+      responses:
+        "204":
+          description: Product removed from collection
+        "400":
+          description: Invalid data
+        "404":
+          description: Collection or product not found
+
+  /admin/collections/{id}/clear/:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Collections Management]
+      summary: Clear collection
+      responses:
+        "204":
+          description: Collection cleared
+        "404":
+          description: Collection not found
