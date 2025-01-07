@@ -37,6 +37,7 @@ router.register("feedback", FeedbackViewSet, basename="feedback")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
+    path("api/cart/", include("cart.urls")),
     path("api/admin/", include(router.urls)),
     path("api/", include("profile.urls")),
 ]
