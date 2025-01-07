@@ -43,7 +43,6 @@ class Cart(BaseModel):
     is_active = models.BooleanField(
         default=True, help_text="True if cart is active, False if cart is inactive"
     )
-    note = models.TextField(blank=True, default="")
     cost = models.DecimalField(
         max_digits=10,
         decimal_places=2,

@@ -10,6 +10,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from feedback.views import FeedbackViewSet
+from order.views import OrderViewSet
 from product.views import (
     CategoryViewSet,
     CollectionViewSet,
@@ -32,12 +33,14 @@ router.register("products", ProductViewSet, basename="product")
 router.register("variants", VariantViewSet, basename="variant")
 router.register("collections", CollectionViewSet, basename="collection")
 router.register("feedback", FeedbackViewSet, basename="feedback")
+router.register("orders", OrderViewSet, basename="order")
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls")),
     path("api/cart/", include("cart.urls")),
+    path("api/order/", include("order.urls")),
     path("api/admin/", include(router.urls)),
     path("api/", include("profile.urls")),
 ]

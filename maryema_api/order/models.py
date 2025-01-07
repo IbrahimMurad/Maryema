@@ -27,13 +27,12 @@ class Order(BaseModel):
     class StatusChoice(models.TextChoices):
         """Status choices for the order model"""
 
-        PENDING = "PENDING", "Pending"
-        PROSSISSING = "PROSSISSING", "Prossissing"
-        CLOSED = "CLOSED", "Closed"
-        FULLFILLED = "FULLFILLED", "Fullfilled"
-        CANCELED = "CANCELED", "Canceled"
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        CLOSED = "closed", "Closed"
+        CANCELED = "cenceled", "Canceled"
 
-    customer = models.ForeignKey(
+    profile = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,
         related_name="orders",
@@ -43,11 +42,12 @@ class Order(BaseModel):
         max_length=20, choices=StatusChoice.choices, default=StatusChoice.PENDING
     )
     total = models.DecimalField(decimal_places=2, max_digits=8, default=0.0)
-    close_reason = models.TextField(blank=True, default="")
+    cancel_reason = models.TextField(blank=True, default="")
     discount_codes = models.ManyToManyField(
         DiscountCode,
         related_name="orders",
         related_query_name="order",
+        blank=True,
         help_text="List of discount codes that are applied to this order",
     )
 
@@ -56,15 +56,10 @@ class Order(BaseModel):
 
     def clean(self, *args, **kwargs):
         """Override the save method check if the order is closed when close reason is not blank"""
-        if self.close_reason and self.status != self.StatusChoice.CLOSED:
-            self.status = self.StatusChoice.CLOSED
-        if (
-            self.status == self.StatusChoice.PROSSISSING
-            or self.status == self.StatusChoice.FULLFILLED
-        ) and not self.items.exists():
-            raise ValidationError(
-                "Order must have at least one item to be processed or fullfilled"
-            )
+        if self.cancel_reason and self.status != self.StatusChoice.CANCELED:
+            self.status = self.StatusChoice.CANCELED
+        if (self.status == self.StatusChoice.PROSSISSING) and not self.items.exists():
+            raise ValidationError("Order must have at least one item to be processed")
         super().clean(*args, **kwargs)
 
     class Meta:
