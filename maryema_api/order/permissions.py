@@ -18,21 +18,3 @@ class IsAdminOrOwner(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return request.user.profile.is_admin or request.user == obj.profile.user
         return request.user.profile.is_admin
-
-
-class IsOwner(permissions.BasePermission):
-    """
-    Permission to allow only the owner to access the object
-    """
-
-    def has_object_permission(self, request, view, obj):
-        return request.user == obj.profile.user
-
-
-class IsAdmin(permissions.BasePermission):
-    """
-    Permission to allow only admin to access the object
-    """
-
-    def has_permission(self, request, view):
-        return request.user.profile.is_admin

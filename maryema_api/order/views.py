@@ -3,8 +3,9 @@ from rest_framework import filters, permissions, status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from core.permissions import IsAdmin, IsOwner
 from order.models import Order, OrderItem
-from order.permissions import IsAdmin, IsAdminOrOwner, IsOwner
+from order.permissions import IsAdminOrOwner
 from order.serializers import OrderItemSerializer, OrderSerializer
 
 

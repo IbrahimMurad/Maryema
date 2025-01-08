@@ -1,12 +1,14 @@
 from profile.serializers import UserSerializer
 
 from django.contrib.auth.models import User
-from django.db.models import Q
-from rest_framework import status, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from core.permissions import IsAdmin
 from feedback.serializers import FeedbackSerializer
 
 
@@ -17,19 +19,16 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    search_fields = ["username", "email", "first_name", "last_name"]
+    filterset_fields = ["is_active", "profile__role"]
 
     def list(self, request):
         """
         List all the users with optional search, role, and is_active filters
         """
         queryset = User.objects.all()
-        if request.query_params.get("search"):
-            queryset = queryset.filter(
-                Q(username__icontains=request.query_params["search"])
-                | Q(email__icontains=request.query_params["search"])
-                | Q(first_name__icontains=request.query_params["search"])
-                | Q(last_name__icontains=request.query_params["search"])
-            )
         if request.query_params.get("role"):
             queryset = queryset.filter(profile__role=request.query_params["role"])
         if request.query_params.get("is_active"):
@@ -50,15 +49,25 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CurrentUserView(APIView):
+
+    def check_authentication(self, request):
+        """
+        Check if the current user is authenticated
+        """
+        if not request.user.is_authenticated:
+            return Response(
+                "Unauthorized",
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        return None
+
     def get(self, request):
         """
         This view returns the current user's information for the profile page
         """
-        if not request.user.is_authenticated:
-            return Response(
-                {"detail": "You need to login first in order to see this page."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        auth_response = self.check_authentication(request)
+        if auth_response:
+            return auth_response
         serializer = UserSerializer(request.user, context={"request": request})
         data = serializer.data.copy()
         data.pop("url")
@@ -68,6 +77,9 @@ class CurrentUserView(APIView):
         """
         This view updates the current user's information in the profile page
         """
+        auth_response = self.check_authentication(request)
+        if auth_response:
+            return auth_response
         serializer = UserSerializer(
             request.user, data=request.data, partial=True, context={"request": request}
         )
@@ -105,7 +117,6 @@ class ChangePassword(APIView):
 def api_root(request):
     return Response(
         {
-            "admin": request.build_absolute_uri("admin/"),
             "me": request.build_absolute_uri("me/"),
         }
     )

@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -13,6 +13,7 @@ from product.models import (
     ProductVariant,
     Size,
 )
+from product.permissions import IsAdminOrReadOnly
 from product.serializers import (
     CategorySerializer,
     ColorSerializer,
@@ -30,33 +31,44 @@ from product.serializers import (
 class DivisionViewSet(viewsets.ModelViewSet):
     queryset = Division.objects.all()
     serializer_class = DivisionSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ColorViewSet(viewsets.ModelViewSet):
     queryset = Color.objects.all()
     serializer_class = ColorSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class SizeViewSet(viewsets.ModelViewSet):
     queryset = Size.objects.all()
     serializer_class = SizeSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ImgViewSet(viewsets.ModelViewSet):
     queryset = Img.objects.all()
     serializer_class = ImgSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
-    @action(methods=["GET", "POST"], detail=True, serializer_class=FeedbackSerializer)
+    @action(
+        methods=["GET", "POST"],
+        detail=True,
+        serializer_class=FeedbackSerializer,
+        permission_classes=[permissions.IsAuthenticatedOrReadOnly],
+    )
     def feedback(self, request, pk):
         product = self.get_object()
         if request.method == "POST":
@@ -75,6 +87,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 class VariantViewSet(viewsets.ModelViewSet):
     queryset = ProductVariant.objects.all()
     serializer_class = VariantSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -84,6 +97,7 @@ class VariantViewSet(viewsets.ModelViewSet):
 
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:

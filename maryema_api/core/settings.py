@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "rest_framework_simplejwt",
-    "django-filters",
+    "django_filters",  # Corrected from "django-filters"
 ]
 
 MIDDLEWARE = [
