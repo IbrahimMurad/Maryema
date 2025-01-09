@@ -19,3 +19,14 @@ class IsOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return request.user == obj.profile.user
+
+
+class IsCustomer(permissions.BasePermission):
+    """
+    Permission to allow only customer to access the object
+
+    P.S. customer is a user with a profile role of "customer"
+    """
+
+    def has_permission(self, request, view):
+        return request.user.profile.is_customer

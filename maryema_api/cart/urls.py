@@ -2,6 +2,7 @@ from django.urls import path
 
 from cart.views import (
     AddToCartView,
+    CheckoutView,
     ClearCartView,
     GetCartView,
     UpdateDeleteCartItemView,
@@ -16,4 +17,5 @@ urlpatterns = [
         UpdateDeleteCartItemView.as_view(),
         name="cart-item",
     ),
+    path("checkout/", CheckoutView.as_view(), name="checkout"),
 ]
