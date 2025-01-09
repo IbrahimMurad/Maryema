@@ -31,7 +31,7 @@ class Profile(BaseModel):
     wishlist = models.ManyToManyField(
         to="product.ProductVariant",
         blank=True,
-        related_name="wishlists",
+        related_name="wished_by",
         related_query_name="wishlist",
     )
 

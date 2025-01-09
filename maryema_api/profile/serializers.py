@@ -13,8 +13,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ["role", "phone_number", "avatar_url", "avatar", "note"]
-        read_only_fields = ["avatar_url"]
+        fields = ["role", "phone_number", "avatar_url", "avatar", "note", "wishlist"]
+        read_only_fields = ["avatar_url", "wishlist"]
         extra_kwargs = {
             "avatar": {"write_only": True},
         }

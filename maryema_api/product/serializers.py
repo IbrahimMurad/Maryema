@@ -92,6 +92,19 @@ class VariantSerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["id", "created_at", "updated_at"]
 
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request.user.is_authenticated and request.user.profile.is_admin:
+            fields.update(
+                {
+                    "wished_by": serializers.PrimaryKeyRelatedField(
+                        many=True, read_only=True, allow_empty=True
+                    )
+                }
+            )
+        return fields
+
 
 class writeVariantSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(

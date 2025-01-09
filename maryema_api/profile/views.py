@@ -3,13 +3,14 @@ from profile.serializers import UserSerializer
 from django.contrib.auth.models import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissions import IsAdmin
 from feedback.serializers import FeedbackSerializer
+from product.serializers import VariantSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,19 +25,6 @@ class UserViewSet(viewsets.ModelViewSet):
     search_fields = ["username", "email", "first_name", "last_name"]
     filterset_fields = ["is_active", "profile__role"]
 
-    def list(self, request):
-        """
-        List all the users with optional search, role, and is_active filters
-        """
-        queryset = User.objects.all()
-        if request.query_params.get("role"):
-            queryset = queryset.filter(profile__role=request.query_params["role"])
-        if request.query_params.get("is_active"):
-            queryset = queryset.filter(is_active=request.query_params["is_active"])
-
-        serializer = UserSerializer(queryset, many=True, context={"request": request})
-        return Response(serializer.data)
-
     @action(detail=True, serializer_class=FeedbackSerializer)
     def feedback(self, request, pk):
         """
@@ -45,6 +33,16 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         feedbacks = user.profile.feedbacks.all()
         serializer = FeedbackSerializer(feedbacks, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["get"])
+    def wishlist(self, request, pk):
+        """
+        List all the product variants in the whishlist of a user
+        """
+        user = self.get_object()
+        whishlist = user.profile.wishlist
+        serializer = VariantSerializer(whishlist, many=True)
         return Response(serializer.data)
 
 
@@ -111,12 +109,3 @@ class ChangePassword(APIView):
         user.set_password(new_password)
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(["GET"])
-def api_root(request):
-    return Response(
-        {
-            "me": request.build_absolute_uri("me/"),
-        }
-    )
