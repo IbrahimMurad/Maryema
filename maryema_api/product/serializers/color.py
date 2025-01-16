@@ -10,3 +10,10 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = "__all__"
         read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class NestedColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Color
+        exclude = ["created_at", "updated_at"]
+        read_only_fields = ["id"]

@@ -19,5 +19,5 @@ from product.serializers.size import SizeSerializer
 from product.serializers.variant import (
     ProductDetailVariantSerializer,
     VariantSerializer,
-    writeVariantSerializer,
+    WriteVariantSerializer,
 )

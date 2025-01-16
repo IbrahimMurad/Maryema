@@ -10,3 +10,10 @@ class ImgSerializer(serializers.ModelSerializer):
         model = Img
         fields = "__all__"
         read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class NestedImgSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Img
+        exclude = ["created_at", "updated_at"]
+        read_only_fields = ["id"]

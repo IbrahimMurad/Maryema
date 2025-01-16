@@ -31,7 +31,7 @@ class VariantSerializer(serializers.ModelSerializer):
         return fields
 
 
-class writeVariantSerializer(serializers.ModelSerializer):
+class WriteVariantSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="variant-detail", read_only=True
     )

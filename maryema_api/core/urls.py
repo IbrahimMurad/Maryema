@@ -29,7 +29,7 @@ router.register("categories", CategoryViewSet, basename="category")
 router.register("colors", ColorViewSet, basename="color")
 router.register("sizes", SizeViewSet, basename="size")
 router.register("imgs", ImgViewSet, basename="img")
-router.register("admin/products", ProductViewSet, basename="admin-product")
+router.register("products", ProductViewSet, basename="product")
 router.register("variants", VariantViewSet, basename="variant")
 router.register("collections", CollectionViewSet, basename="collection")
 router.register("feedback", FeedbackViewSet, basename="feedback")
@@ -42,7 +42,6 @@ urlpatterns = [
     path("api/cart/", include("cart.urls")),
     path("api/order/", include("order.urls")),
     path("api/me/", include("profile.urls")),
-    path("api/product/", include("product.urls")),
     path("api/", include(router.urls)),
 ]
 

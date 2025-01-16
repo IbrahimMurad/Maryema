@@ -1,6 +1,11 @@
+"""
+This module contains the viewsets for the product app
+"""
+
 from profile.serializers import UserSerializer
 
-from rest_framework import generics, mixins, permissions, status, viewsets
+from django.core.exceptions import ValidationError
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -30,49 +35,96 @@ from product.serializers import (
     SizeSerializer,
     VariantSerializer,
     WriteCollectionSerializer,
-    writeVariantSerializer,
+    WriteVariantSerializer,
 )
 
 
 class DivisionViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Division model
+
+    It allows all users to read the divisions but only admin users can create, update or delete them
+    """
+
     queryset = Division.objects.all()
     serializer_class = DivisionSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Category model
+
+    It allows all users to read the categories but only admin users can create, update or delete them
+    """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class ColorViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Color model
+
+    It allows all users to read the colors but only admin users can create, update or delete them
+    """
+
     queryset = Color.objects.all()
     serializer_class = ColorSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class SizeViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Size model
+
+    It allows all users to read the sizes but only admin users can create, update or delete them
+    """
+
     queryset = Size.objects.all()
     serializer_class = SizeSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class ImgViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Img model
+
+    It allows all users to read the images but only admin users can create, update or delete them
+    """
+
     queryset = Img.objects.all()
     serializer_class = ImgSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    """
+    A viewset for the Product model that provides the following <b>extra</b> actions:
+
+    - `feedback`: Get or add feedbacks for a product
+
+    It also, provides different serializers based on user type and action
+    """
+
     permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        if self.request.user.profile.is_admin:
+            return Product.objects.all()
+        return Product.objects.filter(variant__isnull=False)
+
+    def get_serializer_class(self):
+        if self.request.user.profile.is_admin:
+            return ProductSerializer
+        if self.action == "list":
+            return ProductListPublicSerializer
+        return ProductDetailPublicSerializer
 
     @action(
         methods=["GET", "POST"],
         detail=True,
-        serializer_class=FeedbackSerializer,
         permission_classes=[permissions.IsAuthenticatedOrReadOnly],
     )
     def feedback(self, request, pk):
@@ -82,8 +134,14 @@ class ProductViewSet(viewsets.ModelViewSet):
                 data=request.data, context={"request": request}
             )
             if serializer.is_valid():
-                serializer.save(product=product)
-                return Response(serializer.data)
+                try:
+                    serializer.save(product=product)
+                    return Response(serializer.data)
+                except ValidationError as e:
+                    return Response(
+                        {"error": e.messages},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
             return Response(serializer.errors, status=400)
         feedbacks = product.feedbacks.all()
         serializer = FeedbackSerializer(feedbacks, many=True)
@@ -91,6 +149,19 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class VariantViewSet(viewsets.ModelViewSet):
+    """A viewset for the ProductVariant model that provides the following extra actions:
+
+    - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+    - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+    - `wished_by`: Get the users who have added this variant to their wishlist
+
+    All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+    Also, only admin users can create, update or delete them.
+    """
+
     queryset = ProductVariant.objects.all()
     serializer_class = VariantSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -98,7 +169,7 @@ class VariantViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
             return VariantSerializer
-        return writeVariantSerializer
+        return WriteVariantSerializer
 
     @action(
         detail=True,
@@ -106,6 +177,8 @@ class VariantViewSet(viewsets.ModelViewSet):
         url_path="add-to-wishlist",
     )
     def add_to_wishlist(self, request, pk):
+        """Add this variant to the current user's wishlist"""
+
         variant = self.get_object()
         current_user_wishlist = request.user.profile.wishlist
         if variant in current_user_wishlist.all():
@@ -115,7 +188,7 @@ class VariantViewSet(viewsets.ModelViewSet):
             )
         current_user_wishlist.add(variant)
         return Response(
-            {"details": f"{variant} is added to your whishlist successfuly"},
+            {"detail": f"{variant} is added to your wishlist successfully"},
             status=status.HTTP_200_OK,
         )
 
@@ -125,6 +198,7 @@ class VariantViewSet(viewsets.ModelViewSet):
         url_path="remove-from-wishlist",
     )
     def remove_from_wishlist(self, request, pk):
+        """Remove this variant from the current user's wishlist"""
         variant = self.get_object()
         current_user_wishlist = request.user.profile.wishlist
         if variant not in current_user_wishlist.all():
@@ -134,7 +208,7 @@ class VariantViewSet(viewsets.ModelViewSet):
             )
         current_user_wishlist.remove(variant)
         return Response(
-            {"detail": f"{variant} is removed successfuly."},
+            {"detail": f"{variant} is removed successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
 
@@ -144,6 +218,7 @@ class VariantViewSet(viewsets.ModelViewSet):
         url_path="wished-by",
     )
     def wished_by(self, request, pk):
+        """Get the users who have added this variant to their wishlist"""
         variant = self.get_object()
         wished_by = variant.wished_by.select_related("user").all()
         wishing_users = [profile.user for profile in wished_by]
@@ -159,6 +234,14 @@ class VariantViewSet(viewsets.ModelViewSet):
 
 
 class CollectionViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for the Collection model
+
+    Only admin user can perform write actions on this model.
+
+    Different schemas are used for read and write actions.
+    """
+
     queryset = Collection.objects.all()
     permission_classes = [IsAdminOrReadOnly]
 
@@ -166,23 +249,3 @@ class CollectionViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return ReadCollectionSerializer
         return WriteCollectionSerializer
-
-
-class ProductPublicList(mixins.ListModelMixin, generics.GenericAPIView):
-    queryset = Product.objects.filter(variant__isnull=False)
-    serializer_class = ProductListPublicSerializer
-    pagination_class = PageNumberPagination
-    ordering = ["-created_at"]
-
-    @action(detail=False, methods=["get"])
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-
-class ProductPuplicRetrieve(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = Product.objects.filter(variant__isnull=False)
-    serializer_class = ProductDetailPublicSerializer
-
-    @action(detail=True, methods=["get"])
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)

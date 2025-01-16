@@ -13,7 +13,7 @@ class ProductSerializer(serializers.ModelSerializer):
     """A serializer for Product model specific to admin"""
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="admin-product-detail", read_only=True
+        view_name="product-detail", read_only=True
     )
     feedback = FeedbackSerializer(many=True, read_only=True)
 
@@ -41,6 +41,9 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     in_stock = serializers.SerializerMethodField()
+    feedback = serializers.HyperlinkedIdentityField(
+        view_name="product-feedback", read_only=True
+    )
 
     class Meta:
         model = Product
@@ -48,12 +51,18 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "updated_at", "category"]
 
     def get_image(self, obj):
+        if obj.variants.count() == 0:
+            return None
         return obj.variants.get(sort_order=1).image.src.url
 
     def get_price(self, obj):
+        if obj.variants.count() == 0:
+            return None
         return obj.variants.get(sort_order=1).price
 
     def get_in_stock(self, obj):
+        if obj.variants.count() == 0:
+            return 0
         return obj.variants.all().aggregate(in_stock=Sum("quantity"))["in_stock"]
 
 
