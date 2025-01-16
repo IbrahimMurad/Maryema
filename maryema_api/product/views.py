@@ -1,6 +1,6 @@
 from profile.serializers import UserSerializer
 
-from rest_framework import permissions, status, viewsets
+from rest_framework import generics, mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -23,6 +23,8 @@ from product.serializers import (
     ColorSerializer,
     DivisionSerializer,
     ImgSerializer,
+    ProductDetailPublicSerializer,
+    ProductListPublicSerializer,
     ProductSerializer,
     ReadCollectionSerializer,
     SizeSerializer,
@@ -164,3 +166,23 @@ class CollectionViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return ReadCollectionSerializer
         return WriteCollectionSerializer
+
+
+class ProductPublicList(mixins.ListModelMixin, generics.GenericAPIView):
+    queryset = Product.objects.filter(variant__isnull=False)
+    serializer_class = ProductListPublicSerializer
+    pagination_class = PageNumberPagination
+    ordering = ["-created_at"]
+
+    @action(detail=False, methods=["get"])
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class ProductPuplicRetrieve(mixins.RetrieveModelMixin, generics.GenericAPIView):
+    queryset = Product.objects.filter(variant__isnull=False)
+    serializer_class = ProductDetailPublicSerializer
+
+    @action(detail=True, methods=["get"])
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
