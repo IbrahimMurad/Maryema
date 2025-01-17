@@ -1,0 +1,5 @@
+-r requirements.txt
+
+# Development Tools
+black>=24.10.0  # Code formatter
+flake8>=7.1.1   # Code linter

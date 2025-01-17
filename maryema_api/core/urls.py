@@ -9,6 +9,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
+from core.drf_yasg import urlpatterns as open_api_urls
 from feedback.views import FeedbackViewSet
 from order.views import OrderViewSet
 from product.views import (
@@ -44,6 +45,9 @@ urlpatterns = [
     path("api/auth/", include("profile.urls")),
     path("api/", include(router.urls)),
 ]
+
+
+urlpatterns += open_api_urls
 
 if settings.DEBUG:
     from django.conf import settings

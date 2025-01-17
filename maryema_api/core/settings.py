@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework_simplejwt",
     "django_filters",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -148,8 +149,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Rest Framework settings
 
+# ------------------------------------------------------------------------------------------------------
+# About DEFAULT_AUTHERNTICATION_CLASSES:
+# - `CookieJWTAuthentication` is commented out so that you can use browsable api, and for simplisity while testing
+#   this is becasue the browsable api uses django.views.LoginView which is not compatible with JWT authentication
+#   and I have a custom login view.
+# - Currently you are using the default authentication classes.
+# - If you want to test the API with `CookieJWTAuthentication`, uncomment `CookieJWTAuthentication`
+#   and use fetch (in the frontend) with credentials set to 'include' everything should be working fine :)
+# - OpenAPI uses basic authentication by default,
+#   and I did some research and did not found a way to use my `CookieJWTAuthentication`
+#   So, testing the API using OpenAPI will work but without `CookieJWTAuthentication` (commented or not).
+# ------------------------------------------------------------------------------------------------------
+
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("core.authentication.CookieJWTAuthentication",),
+    # "DEFAULT_AUTHENTICATION_CLASSES": ("core.authentication.CookieJWTAuthentication",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
 }

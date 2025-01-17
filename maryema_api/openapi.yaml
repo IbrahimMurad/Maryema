@@ -1,1120 +1,2829 @@
-openapi: "3.0.3"
+swagger: "2.0"
 info:
-  title: "Maryema API"
-  version: "1.0"
-  description: "API documentation for Maryema application"
-
-servers:
-  - url: "https://127.0.0.1:8000/api"
-    description: "API base URL"
-
-tags:
-  - name: Current User
-    description: Operations about currently authenticated user
-  - name: User Management
-    description: Admin operations for managing users
-  - name: Products Management
-    description: Product management operations
-  - name: Product Variants Management
-    description: Product variant operations
-  - name: Collections Management
-    description: Product collections operations
-  - name: Divisions Management
-    description: Division management operations
-  - name: Categories Management
-    description: Category management operations
-  - name: Colors Management
-    description: Color management operations
-  - name: Sizes Management
-    description: Size management operations
-  - name: Images Management
-    description: Product image management operations
-
-components:
-  schemas:
-    Profile:
-      type: object
-      properties:
-        role:
-          type: string
-          enum: [admin, customer, provider]
-          default: customer
-        phone_number:
-          type: string
-          pattern: ^01[012]\d{8}$
-        avatar:
-          type: string
-          format: uri
-          writeOnly: true
-          description: the avatar image field for create and update operations
-        avatar_url:
-          type: string
-          format: uri
-          pattern: ^https://avatar\.iran\.liara\.run/public/[5-9][0-9]$
-          readOnly: true
-          description: Avatar URL endpoint for src attribute in img tag
-        note:
-          type: string
-
-    User:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/users/[0-9]$
-          readOnly: true
-          description: User profile details URL endpoint
-        date_joined:
-          type: string
-          format: date-time
-          readOnly: true
-        last_login:
-          type: string
-          format: date-time
-          readOnly: true
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          writeOnly: true
-        first_name:
-          type: string
-        last_name:
-          type: string
-        is_active:
-          type: boolean
-        profile:
-          $ref: "#/components/schemas/Profile"
-      required:
-        - username
-        - email
-        - password
-
-    Division:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        name:
-          type: string
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/divisions/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-          description: Division details URL endpoint
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-        - name
-
-    Category:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/categories/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-          description: Category details URL endpoint
-        name:
-          type: string
-        division:
-          $ref: "#/components/schemas/Division"
-
-    Color:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/colors/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-          description: Color details URL endpoint
-        color1_name:
-          type: string
-        color1_value:
-          type: string
-          pattern: "^#(?:[0-9a-fA-F]{3}){1,2}$"
-        color2_name:
-          type: string
-        color2_value:
-          type: string
-          pattern: "^#(?:[0-9a-fA-F]{3}){1,2}$"
-      required:
-        - color1_name
-
-    Size:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/sizes/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-          description: Size details URL endpoint
-        name:
-          type: string
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-        - name
-
-    Image:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/imgs/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-          description: Image details URL endpoint
-        src:
-          type: string
-          format: uri
-        alt:
-          type: string
-          default: ""
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-        - src
-
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/products/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-        name:
-          type: string
-        description:
-          type: string
-        tags:
-          type: string
-        category:
-          $ref: "#/components/schemas/Category"
-        provider:
-          $ref: "#/components/schemas/Profile"
-      required:
-        - name
-        - category
-
-    CollectionRead:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-        url:
-          type: string
-          format: uri
-          pattern: ^http://127\.0\.0\.1:8000/api/admin/collections/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/$
-          readOnly: true
-        name:
-          type: string
-        description:
-          type: string
-        tags:
-          type: string
-        products:
-          type: array
-          items:
-            $ref: "#/components/schemas/Product"
-
-    CollectionWrite:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        tags:
-          type: string
-        products:
-          type: array
-          items:
-            type: string
-            format: uuid
-      required:
-        - name
-
+  title: Snippets API
+  description: Test description
+  termsOfService: https://www.google.com/policies/terms/
+  contact:
+    email: contact@snippets.local
+  license:
+    name: BSD License
+  version: v1
+host: 127.0.0.1:8000
+schemes:
+  - http
+basePath: /api
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  Basic:
+    type: basic
+security:
+  - Basic: []
 paths:
-  /me/:
-    get:
-      tags: [Current User]
-      summary: Get current user profile
-      responses:
-        "200":
-          description: Current user profile
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          description: Authentication required
-
-    patch:
-      tags: [Current User]
-      summary: Update current user profile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "200":
-          description: Profile updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid data
-        "401":
-          description: Authentication required
-
-    delete:
-      tags: [Current User]
-      summary: Delete current user account
-      responses:
-        "204":
-          description: Account deleted
-        "401":
-          description: Authentication required
-
-  /me/change-password/:
+  /auth/change-password/:
     post:
-      tags: [Current User]
-      summary: Change user password
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                old_password:
-                  type: string
-                new_password:
-                  type: string
-              required:
-                - old_password
-                - new_password
+      operationId: auth_change-password_create
+      description: This view changes the current user's password
+      parameters: []
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: "missing old password or new password,\n wrong old password"
+        "401":
+          description: "Unauthorized"
+      tags:
+        - auth
+    parameters: []
+  /auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Handle user login by providing JWT tokens in cookies.
+        Implements secure token storage using HTTP-only cookies.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/TokenObtainPair"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/TokenObtainPair"
+      tags:
+        - auth
+    parameters: []
+  /auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: ""
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags:
+        - auth
+    parameters: []
+  /auth/me/:
+    get:
+      operationId: auth_me_list
+      description:
+        This view returns the current user's information for the profile
+        page
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - auth
+    patch:
+      operationId: auth_me_partial_update
+      description:
+        This view updates the current user's information in the profile
+        page
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - auth
+    delete:
+      operationId: auth_me_delete
+      description: This view deletes the current user's account
+      parameters: []
       responses:
         "204":
-          description: Password changed
-        "400":
-          description: Invalid old password
-
-  /admin/users/:
+          description: ""
+      tags:
+        - auth
+    parameters: []
+  /auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Handle token refresh requests by validating refresh token from cookies
+        and providing a new access token.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/TokenRefresh"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/TokenRefresh"
+      tags:
+        - auth
+    parameters: []
+  /auth/register/:
+    post:
+      operationId: auth_register_create
+      description: ""
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags:
+        - auth
+    parameters: []
+  /cart/:
     get:
-      tags: [User Management]
-      summary: List all users (admin only)
+      operationId: cart_list
+      summary: Retrieves the current user's current active cart.
+      description: If there is no active cart, a new one is created
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - cart
+    parameters: []
+  /cart/add/:
+    post:
+      operationId: cart_add_create
+      summary: Adds an item to the current user's active cart.
+      description:
+        If there is no active cart, a new one is created and add the item
+        to it.
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags:
+        - cart
+    parameters: []
+  /cart/checkout/:
+    post:
+      operationId: cart_checkout_create
+      description: Checks out the current user's active cart
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags:
+        - cart
+    parameters: []
+  /cart/clear/:
+    delete:
+      operationId: cart_clear_delete
+      summary: Clears the current user's active cart.
+      description:
+        If there is no active cart, a new one is created which will be
+        already empty
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - cart
+    parameters: []
+  /cart/item/{id}/:
+    patch:
+      operationId: cart_item_partial_update
+      description: Updates the quantity of a cart item
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - cart
+    delete:
+      operationId: cart_item_delete
+      description: Deletes a cart item
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - cart
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /categories/:
+    get:
+      operationId: categories_list
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Category"
+      tags:
+        - categories
+    post:
+      operationId: categories_create
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Category"
+      tags:
+        - categories
+    parameters: []
+  /categories/{id}/:
+    get:
+      operationId: categories_read
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Category"
+      tags:
+        - categories
+    put:
+      operationId: categories_update
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Category"
+      tags:
+        - categories
+    patch:
+      operationId: categories_partial_update
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Category"
+      tags:
+        - categories
+    delete:
+      operationId: categories_delete
+      summary: A viewset for the Category model
+      description:
+        It allows all users to read the categories but only admin users
+        can create, update or delete them
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - categories
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Category.
+        required: true
+        type: string
+        format: uuid
+  /collections/:
+    get:
+      operationId: collections_list
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/ReadCollection"
+      tags:
+        - collections
+    post:
+      operationId: collections_create
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      tags:
+        - collections
+    parameters: []
+  /collections/{id}/:
+    get:
+      operationId: collections_read
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/ReadCollection"
+      tags:
+        - collections
+    put:
+      operationId: collections_update
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      tags:
+        - collections
+    patch:
+      operationId: collections_partial_update
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteCollection"
+      tags:
+        - collections
+    delete:
+      operationId: collections_delete
+      summary: A viewset for the Collection model
+      description: |-
+        Only admin user can perform write actions on this model.
+
+        Different schemas are used for read and write actions.
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - collections
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Collection.
+        required: true
+        type: string
+        format: uuid
+  /colors/:
+    get:
+      operationId: colors_list
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Color"
+      tags:
+        - colors
+    post:
+      operationId: colors_create
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Color"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Color"
+      tags:
+        - colors
+    parameters: []
+  /colors/{id}/:
+    get:
+      operationId: colors_read
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Color"
+      tags:
+        - colors
+    put:
+      operationId: colors_update
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Color"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Color"
+      tags:
+        - colors
+    patch:
+      operationId: colors_partial_update
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Color"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Color"
+      tags:
+        - colors
+    delete:
+      operationId: colors_delete
+      summary: A viewset for the Color model
+      description:
+        It allows all users to read the colors but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - colors
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Color.
+        required: true
+        type: string
+        format: uuid
+  /divisions/:
+    get:
+      operationId: divisions_list
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Division"
+      tags:
+        - divisions
+    post:
+      operationId: divisions_create
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Division"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Division"
+      tags:
+        - divisions
+    parameters: []
+  /divisions/{id}/:
+    get:
+      operationId: divisions_read
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Division"
+      tags:
+        - divisions
+    put:
+      operationId: divisions_update
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Division"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Division"
+      tags:
+        - divisions
+    patch:
+      operationId: divisions_partial_update
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Division"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Division"
+      tags:
+        - divisions
+    delete:
+      operationId: divisions_delete
+      summary: A viewset for the Division model
+      description:
+        It allows all users to read the divisions but only admin users
+        can create, update or delete them
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - divisions
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Division.
+        required: true
+        type: string
+        format: uuid
+  /feedback/:
+    get:
+      operationId: feedback_list
+      description: ""
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Feedback"
+      tags:
+        - feedback
+    post:
+      operationId: feedback_create
+      description: ""
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Feedback"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Feedback"
+      tags:
+        - feedback
+    parameters: []
+  /feedback/{id}/:
+    get:
+      operationId: feedback_read
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Feedback"
+      tags:
+        - feedback
+    put:
+      operationId: feedback_update
+      description: ""
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Feedback"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Feedback"
+      tags:
+        - feedback
+    patch:
+      operationId: feedback_partial_update
+      description: ""
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Feedback"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Feedback"
+      tags:
+        - feedback
+    delete:
+      operationId: feedback_delete
+      description: ""
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - feedback
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Feedback.
+        required: true
+        type: string
+        format: uuid
+  /imgs/:
+    get:
+      operationId: imgs_list
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Img"
+      tags:
+        - imgs
+    post:
+      operationId: imgs_create
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Img"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Img"
+      tags:
+        - imgs
+    parameters: []
+  /imgs/{id}/:
+    get:
+      operationId: imgs_read
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Img"
+      tags:
+        - imgs
+    put:
+      operationId: imgs_update
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Img"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Img"
+      tags:
+        - imgs
+    patch:
+      operationId: imgs_partial_update
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Img"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Img"
+      tags:
+        - imgs
+    delete:
+      operationId: imgs_delete
+      summary: A viewset for the Img model
+      description:
+        It allows all users to read the images but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - imgs
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Image.
+        required: true
+        type: string
+        format: uuid
+  /order/item/{id}/:
+    patch:
+      operationId: order_item_partial_update
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - order
+    delete:
+      operationId: order_item_delete
+      description: ""
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - order
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /orders/:
+    get:
+      operationId: orders_list
+      description: ""
       parameters:
         - name: search
           in: query
-          schema:
-            type: string
-        - name: role
+          description: A search term.
+          required: false
+          type: string
+        - name: page
           in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
           schema:
-            type: string
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Order"
+      tags:
+        - orders
+    post:
+      operationId: orders_create
+      description: Create a new order
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    parameters: []
+  /orders/{id}/:
+    get:
+      operationId: orders_read
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    put:
+      operationId: orders_update
+      description: ""
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    patch:
+      operationId: orders_partial_update
+      description: ""
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    delete:
+      operationId: orders_delete
+      description: ""
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - orders
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /orders/{id}/add-item/:
+    post:
+      operationId: orders_add_item
+      description: Add an item to the order
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /orders/{id}/cancel/:
+    post:
+      operationId: orders_cancel
+      description: Cancel the order
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /orders/{id}/close/:
+    post:
+      operationId: orders_close
+      description: Close the order
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /orders/{id}/process/:
+    post:
+      operationId: orders_process
+      description: Change the status of the order to processing
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Order"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Order"
+      tags:
+        - orders
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /products/:
+    get:
+      operationId: products_list
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters:
+        - name: category
+          in: query
+          description: category
+          required: false
+          type: string
+        - name: collection
+          in: query
+          description: collection
+          required: false
+          type: string
+        - name: division
+          in: query
+          description: division
+          required: false
+          type: string
+        - name: color_name
+          in: query
+          description: color_name
+          required: false
+          type: string
+        - name: color_value
+          in: query
+          description: color_value
+          required: false
+          type: string
+        - name: min_price
+          in: query
+          description: min_price
+          required: false
+          type: string
+        - name: max_price
+          in: query
+          description: max_price
+          required: false
+          type: string
+        - name: size
+          in: query
+          description: size
+          required: false
+          type: string
+        - name: search
+          in: query
+          description: A search term.
+          required: false
+          type: string
+        - name: ordering
+          in: query
+          description: Which field to use when ordering the results.
+          required: false
+          type: string
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/ProductListPublic"
+      tags:
+        - products
+    post:
+      operationId: products_create
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    parameters: []
+  /products/{id}/:
+    get:
+      operationId: products_read
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    put:
+      operationId: products_update
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    patch:
+      operationId: products_partial_update
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    delete:
+      operationId: products_delete
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - products
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /products/{id}/feedback/:
+    get:
+      operationId: products_feedback_read
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    post:
+      operationId: products_feedback_create
+      summary:
+        "A viewset for the Product model that provides the following <b>extra</b>
+        actions:"
+      description: |-
+        - `feedback`: Get or add feedbacks for a product
+
+        It also, provides different serializers based on user type and action
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/ProductDetailPublic"
+      tags:
+        - products
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+  /sizes/:
+    get:
+      operationId: sizes_list
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/Size"
+      tags:
+        - sizes
+    post:
+      operationId: sizes_create
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Size"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/Size"
+      tags:
+        - sizes
+    parameters: []
+  /sizes/{id}/:
+    get:
+      operationId: sizes_read
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Size"
+      tags:
+        - sizes
+    put:
+      operationId: sizes_update
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Size"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Size"
+      tags:
+        - sizes
+    patch:
+      operationId: sizes_partial_update
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Size"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/Size"
+      tags:
+        - sizes
+    delete:
+      operationId: sizes_delete
+      summary: A viewset for the Size model
+      description:
+        It allows all users to read the sizes but only admin users can
+        create, update or delete them
+      parameters: []
+      responses:
+        "204":
+          description: ""
+      tags:
+        - sizes
+    parameters:
+      - name: id
+        in: path
+        description: A UUID string identifying this Size.
+        required: true
+        type: string
+        format: uuid
+  /users/:
+    get:
+      operationId: users_list
+      description: A view set for admin dashboard to manage users
+      parameters:
+        - name: search
+          in: query
+          description: A search term.
+          required: false
+          type: string
         - name: is_active
           in: query
-          schema:
-            type: boolean
-      responses:
-        "200":
-          description: List of users
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-
-    post:
-      tags: [User Management]
-      summary: Create new user (admin only)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "201":
-          description: User created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid data
-
-  /admin/users/{id}/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
+          description: is_active
+          required: false
+          type: string
+        - name: profile__role
+          in: query
+          description: profile__role
+          required: false
+          type: string
+          enum:
+            - admin
+            - customer
+            - provider
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
           type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
+                type: array
+                items:
+                  $ref: "#/definitions/User"
+      tags:
+        - users
+    post:
+      operationId: users_create
+      description: A view set for admin dashboard to manage users
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+      tags:
+        - users
+    parameters: []
+  /users/{id}/:
     get:
-      tags: [User Management]
-      summary: Get user details (admin only)
+      operationId: users_read
+      description: A view set for admin dashboard to manage users
+      parameters: []
       responses:
         "200":
-          description: User details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "404":
-          description: User not found
-
-    patch:
-      tags: [User Management]
-      summary: Partially update user details (admin only)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "200":
-          description: User updated
-        "400":
-          description: Invalid data
-        "404":
-          description: User not found
-
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+      tags:
+        - users
     put:
-      tags: [User Management]
-      summary: Update user details (admin only)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
+      operationId: users_update
+      description: A view set for admin dashboard to manage users
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
       responses:
         "200":
-          description: User updated
-        "400":
-          description: Invalid data
-        "404":
-          description: User not found
-
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+      tags:
+        - users
+    patch:
+      operationId: users_partial_update
+      description: A view set for admin dashboard to manage users
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+      tags:
+        - users
     delete:
-      tags: [User Management]
-      summary: Delete user account (admin only)
+      operationId: users_delete
+      description: A view set for admin dashboard to manage users
+      parameters: []
       responses:
         "204":
-          description: Account deleted
-        "404":
-          description: User not found
-
-  /admin/divisions/:
+          description: ""
+      tags:
+        - users
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this user.
+        required: true
+        type: integer
+  /users/{id}/feedback/:
     get:
-      tags: [Divisions Management]
-      summary: List all divisions
+      operationId: users_feedback
+      description: List all the feedbacks for a user
+      parameters: []
       responses:
         "200":
-          description: List of divisions
-          content:
-            application/json:
-              schema:
+          description: ""
+          schema:
+            $ref: "#/definitions/Feedback"
+      tags:
+        - users
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this user.
+        required: true
+        type: integer
+  /users/{id}/wishlist/:
+    get:
+      operationId: users_wishlist
+      description: List all the product variants in the whishlist of a user
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/User"
+      tags:
+        - users
+    parameters:
+      - name: id
+        in: path
+        description: A unique integer value identifying this user.
+        required: true
+        type: integer
+  /variants/:
+    get:
+      operationId: variants_list
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters:
+        - name: page
+          in: query
+          description: A page number within the paginated result set.
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: ""
+          schema:
+            required:
+              - count
+              - results
+            type: object
+            properties:
+              count:
+                type: integer
+              next:
+                type: string
+                format: uri
+                x-nullable: true
+              previous:
+                type: string
+                format: uri
+                x-nullable: true
+              results:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Division"
+                  $ref: "#/definitions/Variant"
+      tags:
+        - variants
     post:
-      tags: [Divisions Management]
-      summary: Create new division
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
+      operationId: variants_create
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteVariant"
       responses:
         "201":
-          description: Division created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Division"
-
-  /admin/divisions/{id}/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
+    parameters: []
+  /variants/{id}/:
     get:
-      tags: [Divisions Management]
-      summary: Get division details
+      operationId: variants_read
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters: []
       responses:
         "200":
-          description: Division details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Division"
+          description: ""
+          schema:
+            $ref: "#/definitions/Variant"
+      tags:
+        - variants
+    put:
+      operationId: variants_update
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
     patch:
-      tags: [Divisions Management]
-      summary: Update division
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Division"
+      operationId: variants_partial_update
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters:
+        - name: data
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/WriteVariant"
       responses:
         "200":
-          description: Division updated
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
     delete:
-      tags: [Divisions Management]
-      summary: Delete division
+      operationId: variants_delete
+      summary:
+        "A viewset for the ProductVariant model that provides the following
+        extra actions:"
+      description: |-
+        - `add_to_wishlist`: Add the variant to the current user's wishlist
+
+        - `remove_from_wishlist`: Remove the variant from the current user's wishlist
+
+        - `wished_by`: Get the users who have added this variant to their wishlist
+
+        All users can read the variants but only authenticated users can add or remove them from their wishlist.
+
+        Also, only admin users can create, update or delete them.
+      parameters: []
       responses:
         "204":
-          description: Division deleted
-
-  /admin/categories/:
-    get:
-      tags: [Categories Management]
-      summary: List all categories
-      responses:
-        "200":
-          description: List of categories
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Category"
-    post:
-      tags: [Categories Management]
-      summary: Create new category
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                division:
-                  type: string
-                  format: uuid
-              required:
-                - name
-                - division
-      responses:
-        "201":
-          description: Category created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Category"
-        "400":
-          description: Invalid data
-
-  /admin/categories/{id}/:
+          description: ""
+      tags:
+        - variants
     parameters:
       - name: id
         in: path
+        description: A UUID string identifying this Product Variant.
         required: true
-        schema:
-          type: string
-          format: uuid
+        type: string
+        format: uuid
+  /variants/{id}/add-to-wishlist/:
     get:
-      tags: [Categories Management]
-      summary: Get category details
+      operationId: variants_add_to_wishlist
+      description: Add this variant to the current user's wishlist
+      parameters: []
       responses:
         "200":
-          description: Category details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Category"
-    patch:
-      tags: [Categories Management]
-      summary: Update category
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                name:
-                  type: string
-                division:
-                  type: string
-                  format: uuid
-      responses:
-        "200":
-          description: Category updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Category"
-        "400":
-          description: Invalid data
-        "404":
-          description: Category not found
-    delete:
-      tags: [Categories Management]
-      summary: Delete category
-      responses:
-        "204":
-          description: Category deleted
-
-  /admin/colors/:
-    get:
-      tags: [Colors Management]
-      summary: List all colors
-      responses:
-        "200":
-          description: List of colors
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Color"
-    post:
-      tags: [Colors Management]
-      summary: Create new color
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Color"
-      responses:
-        "201":
-          description: Color created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Color"
-
-  /admin/colors/{id}/:
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
     parameters:
       - name: id
         in: path
+        description: A UUID string identifying this Product Variant.
         required: true
-        schema:
-          type: string
-          format: uuid
+        type: string
+        format: uuid
+  /variants/{id}/remove-from-wishlist/:
     get:
-      tags: [Colors Management]
-      summary: Get color details
+      operationId: variants_remove_from_wishlist
+      description: Remove this variant from the current user's wishlist
+      parameters: []
       responses:
         "200":
-          description: Color details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Color"
-        "404":
-          description: Color not found
-    patch:
-      tags: [Colors Management]
-      summary: Update color
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Color"
-      responses:
-        "200":
-          description: Color updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Color"
-        "404":
-          description: Color not found
-    delete:
-      tags: [Colors Management]
-      summary: Delete color
-      responses:
-        "204":
-          description: Color deleted
-        "404":
-          description: Color not found
-
-  /admin/sizes/:
-    get:
-      tags: [Sizes Management]
-      summary: List all sizes
-      responses:
-        "200":
-          description: List of sizes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Size"
-    post:
-      tags: [Sizes Management]
-      summary: Create new size
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Size"
-      responses:
-        "201":
-          description: Size created
-
-  /admin/sizes/{id}/:
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
     parameters:
       - name: id
         in: path
+        description: A UUID string identifying this Product Variant.
         required: true
-        schema:
-          type: string
-          format: uuid
+        type: string
+        format: uuid
+  /variants/{id}/wished-by/:
     get:
-      tags: [Sizes Management]
-      summary: Get size details
+      operationId: variants_wished_by
+      description: Get the users who have added this variant to their wishlist
+      parameters: []
       responses:
         "200":
-          description: Size details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Size"
-        "404":
-          description: Size not found
-    patch:
-      tags: [Sizes Management]
-      summary: Update size
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Size"
-      responses:
-        "200":
-          description: Size updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Size"
-        "404":
-          description: Size not found
-    delete:
-      tags: [Sizes Management]
-      summary: Delete size
-      responses:
-        "204":
-          description: Size deleted
-        "404":
-          description: Size not found
-
-  /admin/imgs/:
-    get:
-      tags: [Images Management]
-      summary: List all product images
-      responses:
-        "200":
-          description: List of images
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Image"
-    post:
-      tags: [Images Management]
-      summary: Upload new image
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/Image"
-      responses:
-        "201":
-          description: Image uploaded
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Image"
-
-  /admin/imgs/{id}/:
+          description: ""
+          schema:
+            $ref: "#/definitions/WriteVariant"
+      tags:
+        - variants
     parameters:
       - name: id
         in: path
+        description: A UUID string identifying this Product Variant.
         required: true
-        schema:
+        type: string
+        format: uuid
+definitions:
+  TokenObtainPair:
+    required:
+      - username
+      - password
+    type: object
+    properties:
+      username:
+        title: Username
+        type: string
+        minLength: 1
+      password:
+        title: Password
+        type: string
+        minLength: 1
+  TokenRefresh:
+    required:
+      - refresh
+    type: object
+    properties:
+      refresh:
+        title: Refresh
+        type: string
+        minLength: 1
+      access:
+        title: Access
+        type: string
+        readOnly: true
+        minLength: 1
+  Category:
+    required:
+      - name
+      - division
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      division:
+        title: Division
+        type: string
+        format: uuid
+  CollectionProduct:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      category:
+        title: Category
+        type: string
+        readOnly: true
+  ReadCollection:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/CollectionProduct"
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+  WriteCollection:
+    required:
+      - name
+      - products
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      products:
+        type: array
+        items:
           type: string
           format: uuid
-    get:
-      tags: [Images Management]
-      summary: Get image details
-      responses:
-        "200":
-          description: Image details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Image"
-    patch:
-      tags: [Images Management]
-      summary: Update image
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/Image"
-      responses:
-        "200":
-          description: Image updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Image"
-        "404":
-          description: Image not found
-    delete:
-      tags: [Images Management]
-      summary: Delete image
-      responses:
-        "204":
-          description: Image deleted
-        "404":
-          description: Image not found
-
-  /admin/products/:
-    get:
-      tags: [Products Management]
-      summary: List all products
-      responses:
-        "200":
-          description: List of products
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Product"
-    post:
-      tags: [Products Management]
-      summary: Create a new product
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-                tags:
-                  type: string
-                category:
-                  type: string
-                  format: uuid
-                provider:
-                  type: string
-                  format: uuid
-      responses:
-        "201":
-          description: Create a new product
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Product"
-        "400":
-          description: Invalide data
-
-  /admin/products/{id}/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
+        uniqueItems: true
+  Color:
+    required:
+      - color1_name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      color1_name:
+        title: First color name
+        type: string
+        maxLength: 20
+        minLength: 1
+      color1_value:
+        title: First color value
+        type: string
+        maxLength: 7
+        x-nullable: true
+      color2_name:
+        title: Second color name
+        type: string
+        maxLength: 20
+        x-nullable: true
+      color2_value:
+        title: Second color value
+        description: a second color for dual-color products
+        type: string
+        maxLength: 7
+        x-nullable: true
+  Division:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+  Feedback:
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      rate:
+        title: Rate
+        description: The rate of the product from 1 to 5 (stars). 0 means no rate.
+        type: integer
+        maximum: 5
+        minimum: 0
+      comment:
+        title: Comment
+        description: The comment of the user.
+        type: string
+      customer:
+        title: Customer
+        type: string
+        format: uuid
+        readOnly: true
+      product:
+        title: Product
+        description: The product that the feedback is for.
+        type: string
+        format: uuid
+        readOnly: true
+  Img:
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      src:
+        title: Src
+        type: string
+        readOnly: true
+        format: uri
+      alt:
+        title: Alt
+        type: string
+        maxLength: 255
+  OrderItem:
+    required:
+      - product_variant
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      quantity:
+        title: Quantity
+        type: integer
+        maximum: 2147483647
+        minimum: 0
+      order:
+        title: Order
+        type: string
+        format: uuid
+        readOnly: true
+      product_variant:
+        title: Product variant
+        type: string
+        format: uuid
+  Order:
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      items:
+        type: array
+        items:
+          $ref: "#/definitions/OrderItem"
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      status:
+        title: Status
+        type: string
+        enum:
+          - pending
+          - processing
+          - closed
+          - cenceled
+        readOnly: true
+      total:
+        title: Total
+        type: string
+        format: decimal
+        readOnly: true
+      cancel_reason:
+        title: Cancel reason
+        type: string
+      profile:
+        title: Profile
+        type: string
+        format: uuid
+        readOnly: true
+      discount_codes:
+        description: List of discount codes that are applied to this order
+        type: array
+        items:
+          description: List of discount codes that are applied to this order
           type: string
           format: uuid
-    get:
-      tags: [Products Management]
-      summary: Get product details
-      responses:
-        "200":
-          description: Product details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Product"
-        "404":
-          description: Product not found
-    patch:
-      tags: [Products Management]
-      summary: Update product
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-                tags:
-                  type: string
-                category:
-                  type: string
-                  format: uuid
-                provider:
-                  type: string
-                  format: uuid
-      responses:
-        "200":
-          description: Product updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Product"
-        "404":
-          description: Product not found
-    delete:
-      tags: [Products Management]
-      summary: Delete product
-      responses:
-        "204":
-          description: Product deleted
-        "404":
-          description: Product not found
-
-  /admin/collections/:
-    get:
-      tags: [Collections Management]
-      summary: List all collections
-      responses:
-        "200":
-          description: List of collections
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CollectionRead"
-    post:
-      tags: [Collections Management]
-      summary: Create a new collection
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CollectionWrite"
-      responses:
-        "201":
-          description: Collection created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CollectionRead"
-        "400":
-          description: Invalid data
-
-  /admin/collections/{id}/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
+        uniqueItems: true
+  CategoryNested:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+  ProductListPublic:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      category:
+        $ref: "#/definitions/CategoryNested"
+      image:
+        title: Image
+        type: string
+        readOnly: true
+      price:
+        title: Price
+        type: string
+        readOnly: true
+      in_stock:
+        title: In stock
+        type: string
+        readOnly: true
+      feedback:
+        title: Feedback
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      tags:
+        title: Tags
+        description: comma separated tags for search purpuses
+        type: string
+  Size:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 3
+        minLength: 1
+  ProductDetailVariant:
+    required:
+      - cost
+      - price
+      - quantity
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      color:
+        $ref: "#/definitions/Color"
+      size:
+        $ref: "#/definitions/Size"
+      image:
+        $ref: "#/definitions/Img"
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      cost:
+        title: Cost
+        type: string
+        format: decimal
+      price:
+        title: Price
+        type: string
+        format: decimal
+      quantity:
+        title: Quantity
+        type: integer
+        maximum: 32767
+        minimum: 0
+      sort_order:
+        title: Sort order
+        type: integer
+        maximum: 2147483647
+        minimum: -2147483648
+  ProductDetailPublic:
+    required:
+      - name
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      category:
+        $ref: "#/definitions/CategoryNested"
+      image:
+        title: Image
+        type: string
+        readOnly: true
+      price:
+        title: Price
+        type: string
+        readOnly: true
+      in_stock:
+        title: In stock
+        type: string
+        readOnly: true
+      feedback:
+        type: array
+        items:
+          $ref: "#/definitions/Feedback"
+        readOnly: true
+      variants:
+        type: array
+        items:
+          $ref: "#/definitions/ProductDetailVariant"
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      name:
+        title: Name
+        type: string
+        maxLength: 64
+        minLength: 1
+      description:
+        title: Description
+        type: string
+      tags:
+        title: Tags
+        description: comma separated tags for search purpuses
+        type: string
+  Profile:
+    type: object
+    properties:
+      role:
+        title: Role
+        type: string
+        enum:
+          - admin
+          - customer
+          - provider
+      phone_number:
+        title: Phone number
+        type: string
+        maxLength: 15
+      avatar_url:
+        title: Avatar url
+        type: string
+        readOnly: true
+      avatar:
+        title: Avatar
+        type: string
+        readOnly: true
+        x-nullable: true
+        format: uri
+      note:
+        title: Note
+        type: string
+      wishlist:
+        type: array
+        items:
           type: string
           format: uuid
-    get:
-      tags: [Collections Management]
-      summary: Get collection details
-      responses:
-        "200":
-          description: Collection details
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CollectionRead"
-        "404":
-          description: Collection not found
-    patch:
-      tags: [Collections Management]
-      summary: Update collection
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                name:
-                  type: string
-                description:
-                  type: string
-                tags:
-                  type: string
-
-      responses:
-        "200":
-          description: Collection updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CollectionRead"
-        "400":
-          description: Invalid data
-        "404":
-          description: Collection not found
-    delete:
-      tags: [Collections Management]
-      summary: Delete collection
-      responses:
-        "204":
-          description: Collection deleted
-        "404":
-          description: Collection not found
-
-  /admin/collections/{id}/add/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    post:
-      tags: [Collections Management]
-      summary: Add product to collection
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product:
-                  type: string
-                  format: uuid
-              required:
-                - product
-      responses:
-        "204":
-          description: Product added to collection
-        "400":
-          description: Invalid data
-        "404":
-          description: Collection or product not found
-
-  /admin/collections/{id}/remove/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-
-    post:
-      tags: [Collections Management]
-      summary: Remove product from collection
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                product:
-                  type: string
-                  format: uuid
-              required:
-                - product
-      responses:
-        "204":
-          description: Product removed from collection
-        "400":
-          description: Invalid data
-        "404":
-          description: Collection or product not found
-
-  /admin/collections/{id}/clear/:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-    post:
-      tags: [Collections Management]
-      summary: Clear collection
-      responses:
-        "204":
-          description: Collection cleared
-        "404":
-          description: Collection not found
+        readOnly: true
+        uniqueItems: true
+  User:
+    required:
+      - username
+      - password
+      - profile
+    type: object
+    properties:
+      id:
+        title: ID
+        type: integer
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      date_joined:
+        title: Date joined
+        type: string
+        format: date-time
+        readOnly: true
+      last_login:
+        title: Last login
+        type: string
+        format: date-time
+        readOnly: true
+        x-nullable: true
+      username:
+        title: Username
+        description:
+          Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+          only.
+        type: string
+        pattern: ^[\w.@+-]+$
+        maxLength: 150
+        minLength: 1
+      email:
+        title: Email address
+        type: string
+        format: email
+        maxLength: 254
+      password:
+        title: Password
+        type: string
+        maxLength: 128
+        minLength: 1
+      first_name:
+        title: First name
+        type: string
+        maxLength: 150
+      last_name:
+        title: Last name
+        type: string
+        maxLength: 150
+      is_active:
+        title: Active
+        description:
+          Designates whether this user should be treated as active. Unselect
+          this instead of deleting accounts.
+        type: boolean
+      profile:
+        $ref: "#/definitions/Profile"
+  Variant:
+    required:
+      - cost
+      - price
+      - quantity
+      - product
+      - image
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      cost:
+        title: Cost
+        type: string
+        format: decimal
+      price:
+        title: Price
+        type: string
+        format: decimal
+      quantity:
+        title: Quantity
+        type: integer
+        maximum: 32767
+        minimum: 0
+      sort_order:
+        title: Sort order
+        type: integer
+        default: 1
+        maximum: 2147483647
+        minimum: -2147483648
+      product:
+        title: Product
+        type: string
+        format: uuid
+      color:
+        title: Color
+        type: string
+        format: uuid
+        x-nullable: true
+      size:
+        title: Size
+        type: string
+        format: uuid
+        x-nullable: true
+      image:
+        title: Image
+        type: string
+        format: uuid
+  WriteVariant:
+    required:
+      - cost
+      - price
+      - quantity
+      - product
+      - image
+    type: object
+    properties:
+      id:
+        title: Id
+        type: string
+        format: uuid
+        readOnly: true
+      url:
+        title: Url
+        type: string
+        format: uri
+        readOnly: true
+      created_at:
+        title: Created at
+        type: string
+        format: date-time
+        readOnly: true
+      updated_at:
+        title: Updated at
+        type: string
+        format: date-time
+        readOnly: true
+      cost:
+        title: Cost
+        type: string
+        format: decimal
+      price:
+        title: Price
+        type: string
+        format: decimal
+      quantity:
+        title: Quantity
+        type: integer
+        maximum: 32767
+        minimum: 0
+      sort_order:
+        title: Sort order
+        type: integer
+        default: 1
+        maximum: 2147483647
+        minimum: -2147483648
+      product:
+        title: Product
+        type: string
+        format: uuid
+      color:
+        title: Color
+        type: string
+        format: uuid
+        x-nullable: true
+      size:
+        title: Size
+        type: string
+        format: uuid
+        x-nullable: true
+      image:
+        title: Image
+        type: string
+        format: uuid
