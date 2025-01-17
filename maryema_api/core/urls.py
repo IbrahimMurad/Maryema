@@ -41,7 +41,7 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("api/cart/", include("cart.urls")),
     path("api/order/", include("order.urls")),
-    path("api/me/", include("profile.urls")),
+    path("api/auth/", include("profile.urls")),
     path("api/", include(router.urls)),
 ]
 
