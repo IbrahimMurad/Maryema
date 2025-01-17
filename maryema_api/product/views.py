@@ -5,13 +5,16 @@ This module contains the viewsets for the product app
 from profile.serializers import UserSerializer
 
 from django.core.exceptions import ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from core.permissions import IsAdmin
 from feedback.serializers import FeedbackSerializer
+from product.filters import ProductFilter
 from product.models import (
     Category,
     Collection,
@@ -109,14 +112,24 @@ class ProductViewSet(viewsets.ModelViewSet):
     """
 
     permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = [
+        "name",
+        "tags",
+        "collection__name",
+    ]
+    ordering_fields = ["created_at", "variant__price"]
+    filterset_class = ProductFilter
 
     def get_queryset(self):
-        if self.request.user.profile.is_admin:
+        user = self.request.user
+        if user.is_authenticated and user.profile.is_admin:
             return Product.objects.all()
         return Product.objects.filter(variant__isnull=False)
 
     def get_serializer_class(self):
-        if self.request.user.profile.is_admin:
+        user = self.request.user
+        if user.is_authenticated and user.profile.is_admin:
             return ProductSerializer
         if self.action == "list":
             return ProductListPublicSerializer
