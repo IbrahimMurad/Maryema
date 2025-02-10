@@ -48,7 +48,7 @@ For the admin, they can:
 
 1. Backend:
 
-<div style="display: flex; justify-content: center; gap: 1.5rem;">
+<div style="display: flex; justify-content: center; flex-direction: row; gap: 1.5rem;">
 
 [![Django](https://img.shields.io/badge/-Django-092E20?style=flat&logo=django&logoColor=white)](https://www.djangoproject.com/)
 
@@ -64,7 +64,7 @@ For the admin, they can:
 
 </div>
 
-1. Frontend:
+2. Frontend:
 
 <div style="display: flex; justify-content: center; gap: 1.5rem;">
 
