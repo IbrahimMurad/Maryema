@@ -48,35 +48,26 @@ For the admin, they can:
 
 1. Backend:
 
-<div style="display: flex; justify-content: center; flex-direction: row; gap: 1.5rem;">
+<p style="display: flex; justify-content: center; flex-direction: row; gap: 1.5rem;">
 
-[![Django](https://img.shields.io/badge/-Django-092E20?style=flat&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![Django](https://img.shields.io/badge/-Django-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![DRF](https://img.shields.io/badge/-Django%20REST%20Framework-red?style=for-the-badge&logo=django)](https://www.django-rest-framework.org/)
+[![JWT](https://img.shields.io/badge/-SimpleJWT-000000?style=for-the-badge&logo=json-web-tokens)](https://django-rest-framework-simplejwt.readthedocs.io/)
+[![Django Filter](https://img.shields.io/badge/-Django%20Filter-blue?style=for-the-badge&logo=django)](https://django-filter.readthedocs.io/)
+[![Redis](https://img.shields.io/badge/-Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
+[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
-[![DRF](https://img.shields.io/badge/-Django%20REST%20Framework-red?style=flat&logo=django)](https://www.django-rest-framework.org/)
-
-[![JWT](https://img.shields.io/badge/-SimpleJWT-000000?style=flat&logo=json-web-tokens)](https://django-rest-framework-simplejwt.readthedocs.io/)
-
-[![Django Filter](https://img.shields.io/badge/-Django%20Filter-blue?style=flat&logo=django)](https://django-filter.readthedocs.io/)
-
-[![Redis](https://img.shields.io/badge/-Redis-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
-
-[![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?style=flat&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-
-</div>
+</p>
 
 2. Frontend:
 
 <div style="display: flex; justify-content: center; gap: 1.5rem;">
 
-[![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=white)](https://reactjs.org/)
-
-[![Material-UI](https://img.shields.io/badge/-Material%20UI-0081CB?style=flat&logo=material-ui&logoColor=white)](https://material-ui.com/)
-
-[![Tailwind CSS](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-
-[![styled-components](https://img.shields.io/badge/-styled%20components-DB7093?style=flat&logo=styled-components&logoColor=white)](https://styled-components.com/)
-
-[![Next.js](https://img.shields.io/badge/-Next.js-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/-React-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![Material-UI](https://img.shields.io/badge/-Material%20UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)](https://material-ui.com/)
+[![Tailwind CSS](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![styled-components](https://img.shields.io/badge/-styled%20components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)](https://styled-components.com/)
+[![Next.js](https://img.shields.io/badge/-Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 
 </div>
 
