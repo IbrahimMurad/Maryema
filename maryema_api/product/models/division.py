@@ -12,6 +12,7 @@ class Division(BaseModel):
         verbose_name = "Division"
         verbose_name_plural = "Divisions"
         db_table = "divisions"
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
