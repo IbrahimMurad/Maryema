@@ -1,6 +1,6 @@
 # Maryema
 
-A clothes and accessories store web application.
+A multi-divisional e-commerce platform for clothes and accessories.
 
 ## Description
 
