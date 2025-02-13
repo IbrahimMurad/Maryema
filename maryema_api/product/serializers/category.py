@@ -16,6 +16,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["id", "created_at", "updated_at"]
 
+    def run_validation(self, data):
+        if "name" in data:
+            data["name"] = " ".join(data["name"].split()).title()
+        return super().run_validation(data)
+
 
 class CategoryNestedSerializer(serializers.ModelSerializer):
     """A serializer for Category model specific to products list view"""
@@ -27,7 +32,7 @@ class CategoryNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "url", "name"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "url", "name"]
 
 
 class DivisionNestedCategorySerializer(serializers.ModelSerializer):
