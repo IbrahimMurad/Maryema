@@ -33,3 +33,19 @@ class TestDivisionModel(TestCase):
         self.assertTrue(isinstance(division.created_at, datetime))
         self.assertIsNotNone(division.updated_at)
         self.assertTrue(isinstance(division.updated_at, datetime))
+
+    def test_unique_division_name(self) -> None:
+        """Test unique name field"""
+        Division.objects.create(name="Division 1")
+        with self.assertRaises(ValidationError):
+            Division.objects.create(name="Division 1")
+
+    def test_clean_name(self) -> None:
+        """Test clean method"""
+        division = Division.objects.create(name="division 1")
+        self.assertEqual(division.name, "Division 1")
+        division = Division.objects.create(name="  division 2  ")
+        self.assertEqual(division.name, "Division 2")
+        division = Division.objects.create(name="  DIVISION 3  ")
+        self.assertEqual(division.name, "Division 3")
+        self.assertRaises(ValidationError, Division.objects.create, name="division 3")
