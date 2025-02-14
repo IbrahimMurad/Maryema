@@ -46,4 +46,4 @@ class DivisionNestedCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ["id", "url", "name", "division"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "url", "name", "division"]

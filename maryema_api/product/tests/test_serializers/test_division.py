@@ -8,10 +8,10 @@ from product.serializers import DivisionNestedSerializer, DivisionSerializer
 
 
 class DivisionSerializerTestCase(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.request = RequestFactory().get("/")
 
-    def test_serialization(self):
+    def test_serialization(self) -> None:
         division = Division.objects.create(name="Clothes")
         serializer = DivisionSerializer(
             instance=division, context={"request": self.request}
@@ -28,7 +28,7 @@ class DivisionSerializerTestCase(TestCase):
             },
         )
 
-    def test_serialization_many(self):
+    def test_serialization_many(self) -> None:
         division1 = Division.objects.create(name="Clothes")
         division2 = Division.objects.create(name="Shoes")
         serializer = DivisionSerializer(
@@ -70,7 +70,7 @@ class DivisionSerializerTestCase(TestCase):
             ],
         )
 
-    def test_deserialization(self):
+    def test_deserialization(self) -> None:
         data = {"name": "Division 1"}
         serializer = DivisionSerializer(data=data, context={"request": self.request})
         self.assertTrue(serializer.is_valid())
@@ -78,14 +78,14 @@ class DivisionSerializerTestCase(TestCase):
         division = serializer.save()
         self.assertEqual(division.name, "Division 1")
 
-    def test_missing_required_field(self):
+    def test_missing_required_field(self) -> None:
         data = {}
         serializer = DivisionSerializer(data=data, context={"request": self.request})
         self.assertFalse(serializer.is_valid())
         self.assertIn("name", serializer.errors)
         self.assertEqual(serializer.errors["name"][0].code, "required")
 
-    def test_unique_field(self):
+    def test_unique_field(self) -> None:
         Division.objects.create(name="Division 1")
         data = {"name": "Division 1"}
         serializer = DivisionSerializer(data=data, context={"request": self.request})
@@ -93,14 +93,14 @@ class DivisionSerializerTestCase(TestCase):
         self.assertIn("name", serializer.errors)
         self.assertEqual(serializer.errors["name"][0].code, "unique")
 
-    def test_extra_field(self):
+    def test_extra_field(self) -> None:
         data = {"name": "Division 1", "extra": "extra"}
         serializer = DivisionSerializer(data=data, context={"request": self.request})
         self.assertTrue(serializer.is_valid())
         self.assertIn("name", serializer.validated_data)
         self.assertNotIn("extra", serializer.validated_data)
 
-    def test_read_only_field(self):
+    def test_read_only_field(self) -> None:
         division = Division.objects.create(name="Division 1")
         data = {"id": uuid.uuid4(), "name": "Division 2"}
         serializer = DivisionSerializer(
@@ -110,7 +110,7 @@ class DivisionSerializerTestCase(TestCase):
         self.assertIn("name", serializer.validated_data)
         self.assertNotIn("id", serializer.validated_data)
 
-    def test_update(self):
+    def test_update(self) -> None:
         division = Division.objects.create(name="Division 1")
         data = {"name": "Division 2"}
         serializer = DivisionSerializer(
@@ -122,10 +122,10 @@ class DivisionSerializerTestCase(TestCase):
 
 
 class DivisionNestedSerializerTestCase(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.request = RequestFactory().get("/")
 
-    def test_serialization(self):
+    def test_serialization(self) -> None:
         division = Division.objects.create(name="Clothes")
         serializer = DivisionNestedSerializer(
             instance=division, context={"request": self.request}
@@ -140,7 +140,7 @@ class DivisionNestedSerializerTestCase(TestCase):
             },
         )
 
-    def test_serialization_many(self):
+    def test_serialization_many(self) -> None:
         division1 = Division.objects.create(name="Clothes")
         division2 = Division.objects.create(name="Shoes")
         serializer = DivisionNestedSerializer(
@@ -170,7 +170,7 @@ class DivisionNestedSerializerTestCase(TestCase):
             ],
         )
 
-    def test_deserialization(self):
+    def test_deserialization(self) -> None:
         data = {"name": "Division 1"}
         serializer = DivisionNestedSerializer(
             data=data, context={"request": self.request}
@@ -180,7 +180,7 @@ class DivisionNestedSerializerTestCase(TestCase):
         division = serializer.save()
         self.assertEqual(division.name, "Division 1")
 
-    def test_missing_required_field(self):
+    def test_missing_required_field(self) -> None:
         data = {}
         serializer = DivisionNestedSerializer(
             data=data, context={"request": self.request}
@@ -189,7 +189,7 @@ class DivisionNestedSerializerTestCase(TestCase):
         self.assertIn("name", serializer.errors)
         self.assertEqual(serializer.errors["name"][0].code, "required")
 
-    def test_unique_field(self):
+    def test_unique_field(self) -> None:
         Division.objects.create(name="Division 1")
         data = {"name": "Division 1"}
         serializer = DivisionNestedSerializer(
@@ -199,7 +199,7 @@ class DivisionNestedSerializerTestCase(TestCase):
         self.assertIn("name", serializer.errors)
         self.assertEqual(serializer.errors["name"][0].code, "unique")
 
-    def test_extra_field(self):
+    def test_extra_field(self) -> None:
         data = {"name": "Division 1", "extra": "extra"}
         serializer = DivisionNestedSerializer(
             data=data, context={"request": self.request}
@@ -208,7 +208,7 @@ class DivisionNestedSerializerTestCase(TestCase):
         self.assertIn("name", serializer.validated_data)
         self.assertNotIn("extra", serializer.validated_data)
 
-    def test_read_only_field(self):
+    def test_read_only_field(self) -> None:
         division = Division.objects.create(name="Division 1")
         data = {"id": uuid.uuid4(), "name": "Division 2"}
         serializer = DivisionNestedSerializer(
@@ -218,7 +218,7 @@ class DivisionNestedSerializerTestCase(TestCase):
         self.assertIn("name", serializer.validated_data)
         self.assertNotIn("id", serializer.validated_data)
 
-    def test_update(self):
+    def test_update(self) -> None:
         division = Division.objects.create(name="Division 1")
         data = {"name": "Division 2"}
         serializer = DivisionNestedSerializer(
