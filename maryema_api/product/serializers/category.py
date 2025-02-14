@@ -17,6 +17,7 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "updated_at"]
 
     def run_validation(self, data):
+        data = data.copy()  # make QueryDict mutable
         if "name" in data:
             data["name"] = " ".join(data["name"].split()).title()
         return super().run_validation(data)
