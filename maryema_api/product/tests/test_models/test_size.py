@@ -36,7 +36,7 @@ class TestSizeModel(TestCase):
 
     def test_invalid_size(self) -> None:
         """Test invalid size"""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValidationError):
             Size.objects.create(name="Invalid Size")
 
     def test_valide_sizes(self) -> None:

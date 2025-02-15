@@ -18,4 +18,4 @@ class DivisionNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Division
         fields = ["id", "url", "name"]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "name", "url"]
