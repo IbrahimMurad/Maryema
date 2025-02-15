@@ -24,6 +24,7 @@ class Size(BaseModel):
         verbose_name = "Size"
         verbose_name_plural = "Sizes"
         db_table = "sizes"
+        ordering = ["created_at"]
 
     def __str__(self) -> str:
         return self.name
