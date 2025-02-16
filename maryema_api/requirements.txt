@@ -8,3 +8,4 @@ drf-yasg>=1.21.7		# Swagger UI for Django REST framework
 redis>=5.2.0		# Redis client for Python
 django-redis>=5.4.0		# Redis cache backend for Django
 Pillow>=10.1.0		# Image processing library
+factory_boy>=3.3.3		# Test fixtures for Django
