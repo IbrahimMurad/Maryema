@@ -1,5 +1,6 @@
 import re
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from core.models import BaseModel
@@ -8,7 +9,7 @@ from core.models import BaseModel
 def validate_color(value: str) -> None:
     """validate that the color is an rgb hexadecimal color code"""
     if not re.match(r"^#(?:[0-9a-fA-F]{3}){1,2}$", value):
-        raise ValueError("This is not a valid color")
+        raise ValidationError("This is not a valid color")
 
 
 class Color(BaseModel):
@@ -38,6 +39,7 @@ class Color(BaseModel):
         verbose_name = "Color"
         verbose_name_plural = "Colors"
         db_table = "colors"
+        ordering = ["color1_name"]
 
     def __str__(self) -> str:
         return f"{self.color1_name}" + (
