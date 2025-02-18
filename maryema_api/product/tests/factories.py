@@ -40,9 +40,9 @@ class ProductFactory(DjangoModelFactory):
         model = Product
 
     category = SubFactory(CategoryFactory)
-    name = Faker("product_name")
+    name = Sequence(lambda n: f"Product {n}")
     description = Faker("text", max_nb_chars=200)
-    tags = LazyFunction(lambda: ",".join(Faker("words", nb=3).generate({})))
+    tags = LazyFunction(lambda: ",".join([f"tag{i}" for i in range(3)]))
 
 
 class ImgFactory(DjangoModelFactory):

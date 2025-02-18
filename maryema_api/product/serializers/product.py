@@ -15,7 +15,9 @@ class ProductSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="product-detail", read_only=True
     )
-    feedback = FeedbackSerializer(many=True, read_only=True)
+    feedback = serializers.HyperlinkedIdentityField(
+        view_name="product-feedback", read_only=True
+    )
 
     class Meta:
         model = Product

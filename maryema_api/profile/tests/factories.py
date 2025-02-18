@@ -21,7 +21,7 @@ class ProfileFactory(DjangoModelFactory):
         model = Profile
 
     user = SubFactory(UserFactory)
-    phone_number = Faker("phone_number")
+    phone_number = Faker("bothify", text="+20????????##")
     note = Faker("text", max_nb_chars=200)
     role = Profile.RoleChoices.CUSTOMER
 
