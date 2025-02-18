@@ -34,6 +34,7 @@ class Product(BaseModel):
         verbose_name = "Product"
         verbose_name_plural = "Products"
         db_table = "products"
+        ordering = ["-created_at"]
 
     def __str__(self) -> str:
         return self.name
