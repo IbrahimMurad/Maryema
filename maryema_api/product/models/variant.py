@@ -35,8 +35,12 @@ class ProductVariant(BaseModel):
         related_name="variants",
         related_query_name="variant",
     )
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    cost = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text="The cost on the seller."
+    )
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, help_text="The price for the customer."
+    )
     quantity = models.PositiveSmallIntegerField()
     sort_order = models.IntegerField(default=1)
 

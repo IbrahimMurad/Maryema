@@ -1,8 +1,19 @@
+import random
+
 from factory import Faker, LazyFunction, Sequence, SubFactory, Trait, lazy_attribute
 from factory.django import DjangoModelFactory
 
 from core.utils import create_image
-from product.models import Category, Color, Division, Img, Product
+from product.models import (
+    Category,
+    Collection,
+    Color,
+    Division,
+    Img,
+    Product,
+    ProductVariant,
+    Size,
+)
 
 
 class ColorFactory(DjangoModelFactory):
@@ -17,6 +28,13 @@ class ColorFactory(DjangoModelFactory):
             color2_name=Faker("color_name"),
             color2_value=Faker("hex_color"),
         )
+
+
+class SizeFactory(DjangoModelFactory):
+    class Meta:
+        model = Size
+
+    name = Sequence(lambda n: ["XS", "S", "M", "L", "XL", "XXL", "12", "30", "24"][n])
 
 
 class DivisionFactory(DjangoModelFactory):
@@ -54,3 +72,34 @@ class ImgFactory(DjangoModelFactory):
         return create_image()
 
     alt = Sequence(lambda n: f"test-image-{n}")
+
+
+class VariantFactory(DjangoModelFactory):
+    class Meta:
+        model = ProductVariant
+
+    product = SubFactory(ProductFactory)
+    color = SubFactory(ColorFactory)
+    image = SubFactory(ImgFactory)
+    cost = Faker("random_int", min=10, max=1000)
+    quantity = Faker("random_int", min=1, max=100)
+    sort_order = Sequence(lambda n: n)
+
+    @lazy_attribute
+    def price(self):
+        # Ensure price is always higher than cost
+        return self.cost + random.randint(50, 300)
+
+    @lazy_attribute
+    def size(self):
+        return Size.objects.order_by("?").first()
+
+
+class CollectionFactory(DjangoModelFactory):
+    class Meta:
+        model = Collection
+
+    name = Sequence(lambda n: f"Collection {n}")
+    description = Faker("text", max_nb_chars=200)
+
+    # I will add products to the collection in the test by hand

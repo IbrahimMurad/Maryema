@@ -50,7 +50,14 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ["provider"]
-        read_only_fields = ["id", "created_at", "updated_at", "category"]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "name",
+            "tags",
+            "description",
+        ]
 
     def get_image(self, obj):
         if obj.variants.count() == 0:
@@ -68,13 +75,21 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
         return obj.variants.all().aggregate(in_stock=Sum("quantity"))["in_stock"]
 
 
-class ProductDetailPublicSerializer(ProductListPublicSerializer):
+class ProductDetailPublicSerializer(serializers.ModelSerializer):
     """A serializer for Product model specific to public and for retrieve action"""
 
-    feedback = FeedbackSerializer(many=True, read_only=True)
+    feedbacks = FeedbackSerializer(many=True, read_only=True)
     variants = ProductDetailVariantSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
         exclude = ["provider"]
-        read_only_fields = ["id", "created_at", "updated_at", "category"]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "name",
+            "tags",
+            "description",
+            "category",
+        ]

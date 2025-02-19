@@ -5,7 +5,7 @@ from PIL import Image
 
 
 def create_image(
-    name: str = "default.png", size: tuple[int, int] = (100, 100)
+    name: str = "default.jpg", size: tuple[int, int] = (100, 100)
 ) -> SimpleUploadedFile:
     file: BytesIO = BytesIO()
     image: Image.Image = Image.new("RGB", size=size)
@@ -13,5 +13,5 @@ def create_image(
     file.name = name
     file.seek(0)
     return SimpleUploadedFile(
-        name=file.name, content=file.read(), content_type="image/png"
+        name=file.name, content=file.read(), content_type="image/jpeg"
     )

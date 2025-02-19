@@ -1,3 +1,5 @@
+import os
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 
@@ -16,6 +18,11 @@ class ImgSerializerTest(TestCase):
         cls.serializer = ImgSerializer(
             instance=cls.image, context={"request": cls.request}
         )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.system("rm -rf media/product_images/default*")
+        super().tearDownClass()
 
     def test_contains_expected_fields(self) -> None:
         data = self.serializer.data
