@@ -12,7 +12,7 @@ class DivisionSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
-class DivisionNestedSerializer(serializers.ModelSerializer):
+class NestedDivisionSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name="division-detail")
 
     class Meta:

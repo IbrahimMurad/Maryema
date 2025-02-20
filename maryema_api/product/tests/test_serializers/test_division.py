@@ -4,7 +4,7 @@ from django.test import RequestFactory, TestCase
 from django.utils.timezone import make_naive
 
 from product.models import Division
-from product.serializers import DivisionNestedSerializer, DivisionSerializer
+from product.serializers import DivisionSerializer, NestedDivisionSerializer
 
 
 class DivisionSerializerTestCase(TestCase):
@@ -129,7 +129,7 @@ class DivisionNestedSerializerTestCase(TestCase):
 
     def test_serialization(self) -> None:
         division = Division.objects.create(name="Clothes")
-        serializer = DivisionNestedSerializer(
+        serializer = NestedDivisionSerializer(
             instance=division, context={"request": self.request}
         )
         expected_url = self.request.build_absolute_uri(f"/api/divisions/{division.id}/")
@@ -145,7 +145,7 @@ class DivisionNestedSerializerTestCase(TestCase):
     def test_serialization_many(self) -> None:
         division1 = Division.objects.create(name="Clothes")
         division2 = Division.objects.create(name="Shoes")
-        serializer = DivisionNestedSerializer(
+        serializer = NestedDivisionSerializer(
             instance=[division1, division2],
             many=True,
             context={"request": self.request},
@@ -174,7 +174,7 @@ class DivisionNestedSerializerTestCase(TestCase):
 
     def test_deserialization(self) -> None:
         data = {"name": "Division 1"}
-        serializer = DivisionNestedSerializer(
+        serializer = NestedDivisionSerializer(
             data=data, context={"request": self.request}
         )
         self.assertTrue(serializer.is_valid())

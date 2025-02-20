@@ -3,10 +3,9 @@ from profile.models import Profile
 from django.db.models import Sum
 from rest_framework import serializers
 
-from feedback.serializers import FeedbackSerializer
 from product.models import Product
-from product.serializers.category import CategoryNestedSerializer
-from product.serializers.variant import ProductDetailVariantSerializer
+from product.serializers.category import NestedCategorySerializer
+from product.serializers.variant import NestedVariantSerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -39,7 +38,7 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="product-detail", read_only=True
     )
-    category = CategoryNestedSerializer(read_only=True)
+    category = NestedCategorySerializer(read_only=True)
     image = serializers.SerializerMethodField()
     price = serializers.SerializerMethodField()
     in_stock = serializers.SerializerMethodField()
@@ -78,8 +77,7 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
 class ProductDetailPublicSerializer(serializers.ModelSerializer):
     """A serializer for Product model specific to public and for retrieve action"""
 
-    feedbacks = FeedbackSerializer(many=True, read_only=True)
-    variants = ProductDetailVariantSerializer(many=True, read_only=True)
+    variants = NestedVariantSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product

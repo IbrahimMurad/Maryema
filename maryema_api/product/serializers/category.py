@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from product.models import Category
-from product.serializers.division import DivisionNestedSerializer
+from product.serializers.division import NestedDivisionSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -23,7 +23,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return super().run_validation(data)
 
 
-class CategoryNestedSerializer(serializers.ModelSerializer):
+class NestedCategorySerializer(serializers.ModelSerializer):
     """A serializer for Category model specific to products list view"""
 
     url = serializers.HyperlinkedIdentityField(
@@ -42,7 +42,7 @@ class DivisionNestedCategorySerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="category-detail", read_only=True
     )
-    division = DivisionNestedSerializer(read_only=True)
+    division = NestedDivisionSerializer(read_only=True)
 
     class Meta:
         model = Category

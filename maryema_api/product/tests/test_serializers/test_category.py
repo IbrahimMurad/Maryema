@@ -3,9 +3,9 @@ from django.test import RequestFactory, TestCase
 
 from product.models import Category, Division
 from product.serializers import (
-    CategoryNestedSerializer,
     CategorySerializer,
     DivisionNestedCategorySerializer,
+    NestedCategorySerializer,
 )
 
 
@@ -136,7 +136,7 @@ class CategoryNestedSerializerTestCase(TestCase):
         )
 
     def test_category_nested_serializer(self) -> None:
-        serializer = CategoryNestedSerializer(
+        serializer = NestedCategorySerializer(
             instance=self.category, context={"request": self.request}
         )
         data = serializer.data
@@ -158,7 +158,7 @@ class CategoryNestedSerializerTestCase(TestCase):
         sweaters = Category.objects.create(name="Sweaters", division=clothes)
         hoodies = Category.objects.create(name="Hoodies", division=clothes)
 
-        serializer = CategoryNestedSerializer(
+        serializer = NestedCategorySerializer(
             clothes.categories.all(),
             many=True,
             context={"request": self.request},
@@ -183,7 +183,7 @@ class CategoryNestedSerializerTestCase(TestCase):
             "name": "Test Category 2",
             "division": self.division.id,
         }
-        serializer = CategoryNestedSerializer(
+        serializer = NestedCategorySerializer(
             instance=self.category, data=data, context={"request": self.request}
         )
         self.assertTrue(serializer.is_valid())
@@ -193,7 +193,7 @@ class CategoryNestedSerializerTestCase(TestCase):
 
     def test_update(self) -> None:
         data = {"name": "Test Category 2", "division": self.division.id}
-        serializer = CategoryNestedSerializer(
+        serializer = NestedCategorySerializer(
             instance=self.category, data=data, context={"request": self.request}
         )
         self.assertTrue(serializer.is_valid())

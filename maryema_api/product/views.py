@@ -12,7 +12,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from core.permissions import IsAdmin
+from core.permissions import IsAdmin, IsAdminOrReadOnly
 from feedback.serializers import FeedbackSerializer
 from product.filters import ProductFilter
 from product.models import (
@@ -25,7 +25,6 @@ from product.models import (
     ProductVariant,
     Size,
 )
-from product.permissions import IsAdminOrReadOnly
 from product.serializers import (
     CategorySerializer,
     ColorSerializer,
@@ -38,7 +37,6 @@ from product.serializers import (
     SizeSerializer,
     VariantSerializer,
     WriteCollectionSerializer,
-    WriteVariantSerializer,
 )
 
 
@@ -177,12 +175,7 @@ class VariantViewSet(viewsets.ModelViewSet):
 
     queryset = ProductVariant.objects.all()
     serializer_class = VariantSerializer
-    permission_classes = [IsAdminOrReadOnly]
-
-    def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
-            return VariantSerializer
-        return WriteVariantSerializer
+    permission_classes = [IsAdmin]
 
     @action(
         detail=True,
