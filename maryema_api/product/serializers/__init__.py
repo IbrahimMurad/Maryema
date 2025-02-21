@@ -16,4 +16,4 @@ from product.serializers.product import (
     ProductSerializer,
 )
 from product.serializers.size import SizeSerializer
-from product.serializers.variant import VariantSerializer
+from product.serializers.variant import NestedVariantSerializer, VariantSerializer

@@ -83,7 +83,7 @@ class VariantFactory(DjangoModelFactory):
     image = SubFactory(ImgFactory)
     cost = Faker("random_int", min=10, max=1000)
     quantity = Faker("random_int", min=1, max=100)
-    sort_order = Sequence(lambda n: n)
+    sort_order = Sequence(lambda n: n + 1)
 
     @lazy_attribute
     def price(self):

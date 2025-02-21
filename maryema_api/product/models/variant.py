@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from core.models import BaseModel
@@ -36,13 +37,19 @@ class ProductVariant(BaseModel):
         related_query_name="variant",
     )
     cost = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text="The cost on the seller."
+        max_digits=10,
+        decimal_places=2,
+        help_text="The cost on the seller.",
+        validators=[MinValueValidator(0)],
     )
     price = models.DecimalField(
-        max_digits=10, decimal_places=2, help_text="The price for the customer."
+        max_digits=10,
+        decimal_places=2,
+        help_text="The price for the customer.",
+        validators=[MinValueValidator(0)],
     )
     quantity = models.PositiveSmallIntegerField()
-    sort_order = models.IntegerField(default=1)
+    sort_order = models.PositiveSmallIntegerField(default=1)
 
     class Meta:
         verbose_name = "Product Variant"

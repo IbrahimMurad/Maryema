@@ -30,4 +30,13 @@ class NestedVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         exclude = ["created_at", "updated_at", "product"]
-        read_only_fields = ["id", "color", "size", "image"]
+        read_only_fields = [
+            "id",
+            "color",
+            "size",
+            "image",
+            "cost",
+            "price",
+            "quantity",
+            "sort_order",
+        ]
