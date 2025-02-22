@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from product.models import Product
 from product.serializers.category import NestedCategorySerializer
-from product.serializers.variant import NestedVariantSerializer
+from product.serializers.variant import ProductDetailVariantSerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -77,7 +77,7 @@ class ProductListPublicSerializer(serializers.ModelSerializer):
 class ProductDetailPublicSerializer(serializers.ModelSerializer):
     """A serializer for Product model specific to public and for retrieve action"""
 
-    variants = NestedVariantSerializer(many=True, read_only=True)
+    variants = ProductDetailVariantSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
