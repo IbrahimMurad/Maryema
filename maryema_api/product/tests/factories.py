@@ -34,7 +34,22 @@ class SizeFactory(DjangoModelFactory):
     class Meta:
         model = Size
 
-    name = Sequence(lambda n: ["XS", "S", "M", "L", "XL", "XXL", "12", "30", "24"][n])
+    name = Sequence(
+        lambda n: [
+            "XS",
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL",
+            "12",
+            "30",
+            "24",
+            "28",
+            "32",
+            "40",
+        ][n]
+    )
 
 
 class DivisionFactory(DjangoModelFactory):
